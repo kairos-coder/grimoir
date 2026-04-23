@@ -5,668 +5,682 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Ealdforn Abbey · The Grimoir</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        :root {
+            --bg:        #08090f;
+            --surface:   #0d1018;
+            --border:    rgba(100, 115, 135, 0.22);
+            --text:      #dde0ea;
+            --muted:     #7a8898;
+            --dim:       #3a4455;
+            --hermes:    #6a7fa0;
+            --apollo:    #7a9e8a;
+            --hephaestus:#9e8a5a;
+            --demeter:   #8a9e6a;
+            --poseidon:  #5a7a9e;
+            --athena:    #9e7a9e;
+            --zeus:      #c8a84a;
+            --chain-glow: rgba(200, 168, 74, 0.05);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            background: #0a0c12;
-            background-image: radial-gradient(circle at 25% 40%, #11161f 0%, #05070a 100%);
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 20% 50%, #0f1520 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, #100f18 0%, transparent 55%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Palatino', 'Georgia', serif;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Palatino Linotype','Palatino','Book Antiqua','Georgia',serif;
             padding: 1rem;
         }
-
         .grimoir {
-            max-width: 860px;
-            width: 100%;
-            background: rgba(8, 10, 16, 0.85);
-            backdrop-filter: blur(3px);
-            border: 1px solid rgba(90, 110, 130, 0.3);
-            border-radius: 2rem;
-            display: flex;
-            flex-direction: column;
-            height: 85vh;
-            min-height: 560px;
-            position: relative;
+            max-width: 880px; width: 100%;
+            background: rgba(10,12,20,0.92);
+            border: 1px solid var(--border);
+            border-radius: 1.8rem;
+            display: flex; flex-direction: column;
+            height: 88vh; min-height: 580px;
+            position: relative; overflow: hidden;
         }
+        .grimoir::before {
+            content:''; position:absolute; inset:0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events:none; border-radius:inherit; z-index:0;
+        }
+        .grimoir > * { position:relative; z-index:1; }
 
+        /* Header */
         .grimoir-header {
-            padding: 1.2rem 1.6rem 0.8rem;
-            border-bottom: 1px solid rgba(210, 190, 150, 0.2);
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
+            padding: 1.1rem 1.8rem 0.9rem;
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0;
         }
-
         .title {
-            font-size: 1.2rem;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, #ebe9e0, #a7b1b8);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
+            font-size: 1.15rem; letter-spacing: 4px;
+            background: linear-gradient(120deg,#ece8dc 0%,#a8b4be 100%);
+            -webkit-background-clip:text; background-clip:text; color:transparent;
+        }
+        .sub { font-size:0.6rem; font-family:monospace; color:var(--muted); letter-spacing:1px; margin-top:2px; }
+        .band-legend { display:flex; gap:0.5rem; align-items:center; }
+        .band-pip { width:7px; height:7px; border-radius:50%; opacity:0.75; }
+
+        /* Output */
+        .output-area { flex:1; overflow-y:auto; padding:1.4rem 1.6rem; scroll-behavior:smooth; }
+        .output-area::-webkit-scrollbar { width:3px; }
+        .output-area::-webkit-scrollbar-thumb { background:rgba(100,115,135,0.25); border-radius:3px; }
+
+        /* Chain wrapper */
+        .chain-wrapper {
+            margin-bottom: 1.4rem;
+            background: var(--chain-glow);
+            border: 1px solid rgba(200,168,74,0.1);
+            border-radius: 1.2rem; overflow: hidden;
+            animation: rise 0.4s ease forwards;
+            opacity: 0; transform: translateY(8px);
+        }
+        @keyframes rise { to { opacity:1; transform:translateY(0); } }
+
+        .chain-header {
+            padding: 0.55rem 1.1rem;
+            background: rgba(200,168,74,0.04);
+            border-bottom: 1px solid rgba(200,168,74,0.09);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .chain-id   { font-family:monospace; font-size:0.58rem; color:rgba(200,168,74,0.45); letter-spacing:1px; }
+        .chain-count{ font-family:monospace; font-size:0.58rem; color:var(--muted); }
+
+        .band-entry {
+            padding: 0.72rem 1.1rem;
+            border-left: 3px solid var(--dim);
+            margin: 0.45rem 0.8rem;
+            border-radius: 0 0.45rem 0.45rem 0;
+        }
+        .band-entry.hermes     { border-left-color: var(--hermes); }
+        .band-entry.apollo     { border-left-color: var(--apollo); }
+        .band-entry.hephaestus { border-left-color: var(--hephaestus); }
+        .band-entry.demeter    { border-left-color: var(--demeter); }
+        .band-entry.poseidon   { border-left-color: var(--poseidon); }
+        .band-entry.athena     { border-left-color: var(--athena); }
+        .band-entry.zeus       { border-left-color: var(--zeus); background:rgba(200,168,74,0.03); }
+
+        .band-label {
+            font-family:monospace; font-size:0.57rem; letter-spacing:2px; text-transform:uppercase;
+            margin-bottom:0.28rem; display:flex; align-items:center; gap:0.4rem;
+        }
+        .band-label .dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+        .band-entry.hermes     .band-label { color:var(--hermes); }
+        .band-entry.apollo     .band-label { color:var(--apollo); }
+        .band-entry.hephaestus .band-label { color:var(--hephaestus); }
+        .band-entry.demeter    .band-label { color:var(--demeter); }
+        .band-entry.poseidon   .band-label { color:var(--poseidon); }
+        .band-entry.athena     .band-label { color:var(--athena); }
+        .band-entry.zeus       .band-label { color:var(--zeus); }
+
+        .band-body { font-size:0.92rem; line-height:1.56; color:var(--text); }
+        .band-entry.zeus       .band-body { color:#ede8d8; font-size:0.97rem; }
+        .band-entry.hermes     .band-body,
+        .band-entry.apollo     .band-body { color:#9aaabb; font-size:0.85rem; font-style:italic; }
+
+        .wc-tag { font-family:monospace; font-size:0.53rem; color:var(--dim); margin-left:auto; }
+
+        .band-connector {
+            width:1px; height:10px;
+            background: linear-gradient(to bottom, var(--dim), transparent);
+            margin: 0 0 0 calc(0.8rem + 3px + 0.45rem); opacity:0.4;
         }
 
-        .sub {
-            font-size: 0.65rem;
-            font-family: monospace;
-            color: #6a7a8a;
-        }
-
-        .output-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1.6rem;
-            scroll-behavior: smooth;
-        }
-
-        .output-area::-webkit-scrollbar {
-            width: 4px;
-        }
-        .output-area::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .output-area::-webkit-scrollbar-thumb {
-            background: rgba(90, 110, 130, 0.3);
-            border-radius: 4px;
-        }
-
+        /* Simple cards */
         .entry-card {
-            background: rgba(15, 18, 26, 0.6);
-            border-radius: 1rem;
-            padding: 1rem 1.2rem;
-            margin-bottom: 1rem;
-            border-left: 3px solid #6b8e5e;
-            animation: fadeSlideIn 0.3s ease forwards;
-            opacity: 0;
-            transform: translateY(6px);
+            background: rgba(15,18,28,0.5); border-radius:0.9rem;
+            padding:0.9rem 1.1rem; margin-bottom:1rem;
+            border-left:3px solid var(--dim);
+            animation: rise 0.3s ease forwards; opacity:0; transform:translateY(5px);
         }
+        .entry-card.inscribed { border-left-color:var(--zeus); }
+        .entry-card.system    { border-left-color:#3a4455; animation:none; opacity:1; transform:none; }
+        .entry-meta { font-size:0.6rem; font-family:monospace; color:var(--muted); margin-bottom:0.3rem; }
+        .entry-body { font-size:0.93rem; line-height:1.55; color:var(--text); }
+        .entry-body.muted { color:var(--muted); font-style:italic; }
 
-        .entry-card.harvest-card {
-            border-left-color: #8e7a5e;
-        }
+        mark { background:rgba(180,150,60,0.22); color:#e2c97a; border-radius:2px; padding:0 2px; }
 
-        .entry-card.find-card {
-            border-left-color: #5e7a8e;
-        }
-
-        .entry-card.system-card {
-            border-left-color: #5a5e6a;
-        }
-
-        @keyframes fadeSlideIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .entry-meta {
-            font-size: 0.65rem;
-            font-family: monospace;
-            color: #8696aa;
-            margin-bottom: 0.4rem;
-        }
-
-        .entry-body {
-            font-size: 0.95rem;
-            line-height: 1.5;
-            color: #e0e2e9;
-        }
-
-        /* Highlighted match text */
-        mark {
-            background: rgba(180, 150, 70, 0.28);
-            color: #e2c97a;
-            border-radius: 3px;
-            padding: 0 2px;
-            font-style: inherit;
-        }
-
-        /* Section header card for grouped results */
         .section-banner {
-            font-family: monospace;
-            font-size: 0.7rem;
-            color: #6a7a8a;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            padding: 0.4rem 0.8rem;
-            border-bottom: 1px solid rgba(90, 110, 130, 0.2);
-            margin-bottom: 0.6rem;
+            font-family:monospace; font-size:0.6rem; color:var(--muted);
+            letter-spacing:2px; text-transform:uppercase;
+            padding:0.3rem 0.4rem; margin-bottom:0.7rem;
+            border-bottom:1px solid var(--border);
         }
 
-        .command-section {
-            background: #05070c;
-            border-top: 1px solid rgba(120, 130, 150, 0.25);
-            padding: 0.8rem 1.2rem;
-            display: flex;
-            gap: 0.6rem;
-            align-items: center;
-            border-radius: 0 0 2rem 2rem;
+        /* find / band result card */
+        .result-wrapper {
+            margin-bottom:0.9rem;
+            border-radius:0.9rem; overflow:hidden;
+            border: 1px solid rgba(100,115,135,0.15);
+            animation: rise 0.3s ease forwards; opacity:0; transform:translateY(5px);
         }
-
-        .prompt {
-            font-family: monospace;
-            color: #9eb2c5;
-            font-size: 0.9rem;
+        .result-header {
+            padding:0.45rem 1rem;
+            display:flex; justify-content:space-between; align-items:center;
         }
+        .result-band-name { font-family:monospace; font-size:0.57rem; letter-spacing:2px; text-transform:uppercase; display:flex; align-items:center; gap:0.4rem; }
+        .result-date      { font-family:monospace; font-size:0.57rem; color:var(--muted); }
+        .result-body-wrap { padding:0.7rem 1.1rem 0.7rem; border-left-width:3px; border-left-style:solid; margin:0.4rem 0.7rem 0.6rem; border-radius:0 0.4rem 0.4rem 0; }
+        .result-body      { font-size:0.91rem; line-height:1.55; color:var(--text); }
+        .result-wc        { font-family:monospace; font-size:0.53rem; color:var(--dim); margin-top:0.25rem; }
 
-        #commandInput {
-            flex: 1;
-            background: #0f131c;
-            border: 1px solid #2a2f3a;
-            color: #f0f2f5;
-            padding: 0.6rem 1rem;
-            font-family: monospace;
-            font-size: 0.85rem;
-            border-radius: 60px;
-            outline: none;
-            transition: border-color 0.2s;
+        /* Bottom bar */
+        .bottom-bar {
+            border-top:1px solid var(--border);
+            background: rgba(6,8,14,0.9);
+            flex-shrink:0; border-radius:0 0 1.8rem 1.8rem;
         }
-
-        #commandInput:focus {
-            border-color: rgba(110, 140, 100, 0.5);
-        }
-
-        button {
-            background: #1e2532;
-            border: none;
-            color: #ddd3c2;
-            padding: 0.5rem 1.2rem;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-family: 'Palatino', 'Georgia', serif;
-        }
-
-        button:hover {
-            background: #2f384a;
-        }
-
+        .feedback-row { padding:0.3rem 1.4rem 0; display:flex; justify-content:flex-end; }
         .sys-feedback {
-            font-size: 0.7rem;
-            font-family: monospace;
-            color: #a5b0c0;
-            background: #0e121b;
-            padding: 0.25rem 0.8rem;
-            border-radius: 30px;
-            display: inline-block;
-            margin: 0.3rem 1.2rem 0.6rem;
-            float: right;
-            transition: color 0.3s;
+            font-size:0.6rem; font-family:monospace; color:var(--muted);
+            background:rgba(15,18,28,0.8); padding:0.2rem 0.7rem; border-radius:20px;
         }
-
-        .sys-feedback.error {
-            color: #c08080;
+        .sys-feedback.error { color:#b07070; }
+        .command-row { padding:0.7rem 1.2rem 0.9rem; display:flex; gap:0.6rem; align-items:center; }
+        .prompt { font-family:monospace; color:var(--muted); font-size:0.9rem; flex-shrink:0; }
+        #commandInput {
+            flex:1; background:rgba(15,18,28,0.9);
+            border:1px solid rgba(80,95,115,0.3); color:#eef0f5;
+            padding:0.55rem 1rem; font-family:monospace; font-size:0.82rem;
+            border-radius:50px; outline:none; transition:border-color 0.2s;
         }
-
-        .clearfix::after {
-            content: '';
-            display: table;
-            clear: both;
+        #commandInput:focus { border-color:rgba(140,120,60,0.4); }
+        #commandInput::placeholder { color:#2e3848; }
+        .invoke-btn {
+            background:rgba(30,36,52,0.9); border:1px solid rgba(80,95,115,0.3);
+            color:#c8bfa8; padding:0.5rem 1.1rem; border-radius:40px; cursor:pointer;
+            font-family:'Palatino Linotype','Palatino',Georgia,serif; font-size:0.82rem;
+            transition:background 0.2s,border-color 0.2s; flex-shrink:0;
         }
+        .invoke-btn:hover { background:rgba(45,54,76,0.9); border-color:rgba(140,120,60,0.3); }
 
-        /* Help overlay */
+        /* Help */
         .help-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(5, 7, 12, 0.96);
-            backdrop-filter: blur(8px);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity 0.2s, visibility 0.2s;
-            border-radius: 2rem;
+            position:absolute; inset:0;
+            background:rgba(5,7,12,0.97); backdrop-filter:blur(10px);
+            z-index:200; display:flex; align-items:center; justify-content:center;
+            visibility:hidden; opacity:0; transition:opacity 0.2s,visibility 0.2s;
+            border-radius:inherit;
         }
-
-        .help-overlay.visible {
-            visibility: visible;
-            opacity: 1;
-        }
-
+        .help-overlay.visible { visibility:visible; opacity:1; }
         .help-panel {
-            max-width: 480px;
-            width: 88%;
-            background: #0f131e;
-            border: 1px solid #3a4555;
-            border-radius: 1.5rem;
-            padding: 1.8rem 2rem;
-            position: relative;
+            max-width:500px; width:88%; background:#0d1018;
+            border:1px solid rgba(100,115,135,0.3); border-radius:1.4rem;
+            padding:1.8rem 2rem; position:relative;
         }
-
         .help-panel h3 {
-            font-size: 0.75rem;
-            font-family: monospace;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: #8a9ab0;
-            margin-bottom: 1.2rem;
-            padding-bottom: 0.6rem;
-            border-bottom: 1px solid #2a3040;
+            font-size:0.62rem; font-family:monospace; letter-spacing:3px;
+            text-transform:uppercase; color:var(--muted);
+            margin-bottom:1.1rem; padding-bottom:0.6rem; border-bottom:1px solid var(--border);
         }
+        .help-panel ul { list-style:none; }
+        .help-panel li { margin-bottom:0.9rem; padding-left:1rem; border-left:2px solid var(--dim); }
+        .cmd-name { font-family:monospace; color:#d4b96a; font-size:0.85rem; display:block; margin-bottom:0.12rem; }
+        .cmd-desc { color:var(--muted); font-size:0.76rem; line-height:1.4; }
+        .close-help { position:absolute; top:1rem; right:1.2rem; font-size:1rem; cursor:pointer; color:var(--muted); background:none; border:none; font-family:monospace; }
+        .close-help:hover { color:var(--text); }
+        .band-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.35rem 1.2rem; margin-top:0.7rem; }
+        .band-row { display:flex; align-items:center; gap:0.45rem; font-family:monospace; font-size:0.7rem; }
+        .band-swatch { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 
-        .help-panel ul {
-            list-style: none;
-        }
-
-        .help-panel li {
-            margin-bottom: 0.9rem;
-            font-size: 0.88rem;
-            color: #cddbe9;
-            padding-left: 1rem;
-            border-left: 2px solid #3a4a5a;
-            line-height: 1.5;
-        }
-
-        .help-panel .cmd {
-            font-family: monospace;
-            color: #e2bc7c;
-            display: block;
-            margin-bottom: 0.15rem;
-        }
-
-        .cmd-desc {
-            color: #8a9ab0;
-            font-size: 0.8rem;
-        }
-
-        .close-help {
-            position: absolute;
-            top: 1rem;
-            right: 1.2rem;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: #6a7a8a;
-            background: none;
-            border: none;
-            padding: 0.2rem 0.5rem;
-        }
-
-        .close-help:hover {
-            color: #a0b0c0;
-            background: none;
-        }
-
-        .loading-pulse {
-            display: inline-block;
-            animation: pulse 1.2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
+        .pulse { animation:pulse 1.1s ease-in-out infinite; display:inline-block; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
     </style>
 </head>
 <body>
-
 <div class="grimoir">
     <div class="grimoir-header">
-        <div class="title">Ealdforn Grimoir</div>
-        <div class="sub">— working archive —</div>
+        <div>
+            <div class="title">Ealdforn Grimoir</div>
+            <div class="sub">— spectral archive · all bands —</div>
+        </div>
+        <div class="band-legend">
+            <div class="band-pip" style="background:var(--hermes)"    title="hermes"></div>
+            <div class="band-pip" style="background:var(--apollo)"    title="apollo"></div>
+            <div class="band-pip" style="background:var(--hephaestus)"title="hephaestus"></div>
+            <div class="band-pip" style="background:var(--demeter)"   title="demeter"></div>
+            <div class="band-pip" style="background:var(--poseidon)"  title="poseidon"></div>
+            <div class="band-pip" style="background:var(--athena)"    title="athena"></div>
+            <div class="band-pip" style="background:var(--zeus);box-shadow:0 0 6px rgba(200,168,74,0.55);" title="zeus"></div>
+        </div>
     </div>
 
     <div class="output-area" id="outputArea">
-        <div class="entry-card" style="animation: none; opacity: 1; transform: none;">
+        <div class="entry-card system">
             <div class="entry-meta">◈ initium ◈</div>
             <div class="entry-body">
-                Type <span style="color:#c3b87c;">relic</span> to read a passage.
-                <span style="color:#9ab3c9;">write [text]</span> to inscribe.
-                <span style="color:#9ab3c9;">find [text]</span> to search.
-                <span style="color:#9ab3c9;">harvest</span> for recent entries.
-                <span style="color:#8a9ab0;">help</span> for all commands.
+                The Grimoir reads full evolution chains — seed to artifact.<br>
+                <span style="color:var(--muted);font-size:0.84rem;">
+                    <span style="color:#d4b96a;">relic</span> ·
+                    <span style="color:#9ab3c9;">harvest</span> ·
+                    <span style="color:#9ab3c9;">find [text]</span> ·
+                    <span style="color:#9ab3c9;">band [name]</span> ·
+                    <span style="color:#9ab3c9;">chain [id]</span> ·
+                    <span style="color:#9ab3c9;">write [text]</span> ·
+                    <span style="color:var(--muted);">help</span>
+                </span>
             </div>
         </div>
     </div>
 
-    <div style="height: 0;" class="clearfix">
-        <span class="sys-feedback" id="sysFeedback">⚙️ ready</span>
+    <div class="bottom-bar">
+        <div class="feedback-row">
+            <span class="sys-feedback" id="sysFeedback">⚙ ready</span>
+        </div>
+        <div class="command-row">
+            <span class="prompt">⟡</span>
+            <input type="text" id="commandInput" placeholder="relic · harvest · find · band · chain · write · help" autofocus>
+            <button class="invoke-btn" id="submitBtn">invoke</button>
+        </div>
     </div>
 
-    <div class="command-section">
-        <span class="prompt">⟡</span>
-        <input type="text" id="commandInput" placeholder="relic · write · find · harvest · help" autofocus>
-        <button id="submitBtn">invoke</button>
-    </div>
-
-    <!-- Help Overlay -->
     <div class="help-overlay" id="helpOverlay">
         <div class="help-panel">
             <button class="close-help" id="closeHelp">✕</button>
-            <h3>⟡ Grimoir Commands</h3>
+            <h3>⟡ Grimoir · Command Reference</h3>
             <ul>
-                <li>
-                    <span class="cmd">relic</span>
-                    <span class="cmd-desc">Summon a random passage from the archive.</span>
-                </li>
-                <li>
-                    <span class="cmd">write [text]</span>
-                    <span class="cmd-desc">Inscribe new text into the grimoir.</span>
-                </li>
-                <li>
-                    <span class="cmd">find [text]</span>
-                    <span class="cmd-desc">Search the archive for passages containing your phrase. Matches are highlighted.</span>
-                </li>
-                <li>
-                    <span class="cmd">harvest</span>
-                    <span class="cmd-desc">Surface the 5 most recently inscribed passages, newest first.</span>
-                </li>
-                <li>
-                    <span class="cmd">help</span>
-                    <span class="cmd-desc">Show this command reference.</span>
-                </li>
+                <li><span class="cmd-name">relic</span><span class="cmd-desc">Surface a complete evolution chain — all bands from seed to artifact.</span></li>
+                <li><span class="cmd-name">harvest</span><span class="cmd-desc">Show the 5 most recent chains, anchored by zeus entries.</span></li>
+                <li><span class="cmd-name">find [text]</span><span class="cmd-desc">Search across all seven spectral tables. Matches highlighted per band.</span></li>
+                <li><span class="cmd-name">band [name]</span><span class="cmd-desc">Browse a specific level: hermes · apollo · hephaestus · demeter · poseidon · athena · zeus</span></li>
+                <li><span class="cmd-name">chain [id]</span><span class="cmd-desc">Pull a specific chain by evolution_chain_id or zeus entry id.</span></li>
+                <li><span class="cmd-name">write [text]</span><span class="cmd-desc">Inscribe a manual artifact directly into zeus_entries.</span></li>
             </ul>
+            <div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid var(--border);">
+                <div style="font-family:monospace;font-size:0.58rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Spectral Bands</div>
+                <div class="band-grid">
+                    <div class="band-row"><span class="band-swatch" style="background:var(--hermes)"></span><span style="color:var(--hermes)">hermes</span><span style="color:var(--dim)"> 1-2w</span></div>
+                    <div class="band-row"><span class="band-swatch" style="background:var(--poseidon)"></span><span style="color:var(--poseidon)">poseidon</span><span style="color:var(--dim)"> 21-35w</span></div>
+                    <div class="band-row"><span class="band-swatch" style="background:var(--apollo)"></span><span style="color:var(--apollo)">apollo</span><span style="color:var(--dim)"> 3-5w</span></div>
+                    <div class="band-row"><span class="band-swatch" style="background:var(--athena)"></span><span style="color:var(--athena)">athena</span><span style="color:var(--dim)"> 36-50w</span></div>
+                    <div class="band-row"><span class="band-swatch" style="background:var(--hephaestus)"></span><span style="color:var(--hephaestus)">hephaestus</span><span style="color:var(--dim)"> 6-10w</span></div>
+                    <div class="band-row"><span class="band-swatch" style="background:var(--zeus);box-shadow:0 0 4px rgba(200,168,74,0.4)"></span><span style="color:var(--zeus)">zeus</span><span style="color:var(--dim)"> apex</span></div>
+                    <div class="band-row"><span class="band-swatch" style="background:var(--demeter)"></span><span style="color:var(--demeter)">demeter</span><span style="color:var(--dim)"> 11-20w</span></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    const SUPABASE_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
-    const TABLE = 'zeus_entries';
+const SB_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
+const SB_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
 
-    const outputDiv = document.getElementById('outputArea');
-    const commandInput = document.getElementById('commandInput');
-    const sysFeedback = document.getElementById('sysFeedback');
-    const helpOverlay = document.getElementById('helpOverlay');
-    const closeHelp = document.getElementById('closeHelp');
+const BANDS = [
+    { name:'hermes',     table:'hermes_entries',     color:'#6a7fa0', words:'1-2'   },
+    { name:'apollo',     table:'apollo_entries',     color:'#7a9e8a', words:'3-5'   },
+    { name:'hephaestus', table:'hephaestus_entries', color:'#9e8a5a', words:'6-10'  },
+    { name:'demeter',    table:'demeter_entries',    color:'#8a9e6a', words:'11-20' },
+    { name:'poseidon',   table:'poseidon_entries',   color:'#5a7a9e', words:'21-35' },
+    { name:'athena',     table:'athena_entries',     color:'#9e7a9e', words:'36-50' },
+    { name:'zeus',       table:'zeus_entries',       color:'#c8a84a', words:'apex'  },
+];
+const BAND_BY_NAME = {};
+BANDS.forEach(b => { BAND_BY_NAME[b.name] = b; });
+const BAND_ORDER = BANDS.map(b => b.name);
 
-    let feedbackTimer = null;
+const outputDiv    = document.getElementById('outputArea');
+const commandInput = document.getElementById('commandInput');
+const sysFeedback  = document.getElementById('sysFeedback');
+const helpOverlay  = document.getElementById('helpOverlay');
+let   fbTimer      = null;
 
-    function setFeedback(msg, isError = false) {
-        if (feedbackTimer) clearTimeout(feedbackTimer);
-        sysFeedback.className = 'sys-feedback' + (isError ? ' error' : '');
-        sysFeedback.innerHTML = isError ? `⚠️ ${msg}` : `✦ ${msg}`;
-        feedbackTimer = setTimeout(() => {
-            sysFeedback.className = 'sys-feedback';
-            sysFeedback.innerHTML = `⚙️ ready`;
-        }, 3000);
-    }
-
-    function setLoading(msg) {
-        if (feedbackTimer) clearTimeout(feedbackTimer);
+// ── Feedback ─────────────────────────────────────────────────────────────────
+function setFeedback(msg, isError=false) {
+    if (fbTimer) clearTimeout(fbTimer);
+    sysFeedback.className = 'sys-feedback' + (isError ? ' error' : '');
+    sysFeedback.textContent = isError ? `⚠ ${msg}` : `✦ ${msg}`;
+    fbTimer = setTimeout(() => {
         sysFeedback.className = 'sys-feedback';
-        sysFeedback.innerHTML = `<span class="loading-pulse">◌</span> ${msg}`;
-    }
+        sysFeedback.textContent = '⚙ ready';
+    }, 3500);
+}
+function setLoading(msg) {
+    if (fbTimer) clearTimeout(fbTimer);
+    sysFeedback.className = 'sys-feedback';
+    sysFeedback.innerHTML = `<span class="pulse">◌</span> ${msg}`;
+}
 
-    function formatText(text) {
-        if (!text) return '… empty passage …';
-        if (text.startsWith('Within the Abbey,')) return text;
-        return `Within the Abbey, ${text.charAt(0).toLowerCase() + text.slice(1)}`;
-    }
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function highlight(text, term) {
+    if (!term) return esc(text);
+    const e = esc(text);
+    const re = new RegExp(`(${esc(term).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+    return e.replace(re, '<mark>$1</mark>');
+}
+function fmt(text) {
+    if (!text) return '… empty passage …';
+    if (text.startsWith('Within the Abbey,')) return text;
+    return `Within the Abbey, ${text.charAt(0).toLowerCase() + text.slice(1)}`;
+}
+function fmtDate(ts) {
+    if (!ts) return '—';
+    return new Date(ts).toLocaleString();
+}
+function hexRgb(hex) {
+    return `${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)}`;
+}
+function addBanner(text) {
+    const el = document.createElement('div');
+    el.className = 'section-banner';
+    el.textContent = text;
+    outputDiv.appendChild(el);
+}
+function addSystemCard(msg) {
+    const c = document.createElement('div');
+    c.className = 'entry-card system';
+    c.innerHTML = `<div class="entry-meta">◇ system</div><div class="entry-body muted">${esc(msg)}</div>`;
+    outputDiv.appendChild(c);
+    c.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
 
-    // Highlight occurrences of `term` within `text` (plain text, returns HTML-safe string)
-    function highlightMatch(text, term) {
-        if (!term) return escapeHtml(text);
-        const escaped = escapeHtml(text);
-        const escapedTerm = escapeHtml(term).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(`(${escapedTerm})`, 'gi');
-        return escaped.replace(regex, '<mark>$1</mark>');
-    }
+// ── API ───────────────────────────────────────────────────────────────────────
+async function sbGet(table, qs='') {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}${qs}`, {
+        headers:{ 'apikey':SB_KEY, 'Authorization':`Bearer ${SB_KEY}` }
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+}
+async function sbPost(table, body) {
+    const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
+        method:'POST',
+        headers:{ 'apikey':SB_KEY, 'Authorization':`Bearer ${SB_KEY}`, 'Content-Type':'application/json' },
+        body: JSON.stringify(body)
+    });
+    if (!r.ok) { const t=await r.text(); throw new Error(`HTTP ${r.status}: ${t}`); }
+}
 
-    function escapeHtml(str) {
-        return str
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;');
-    }
+// ── Chain rendering ───────────────────────────────────────────────────────────
+function renderChain(entries, delay=0, hlTerm=null) {
+    if (!entries || entries.length === 0) return;
+    const w = document.createElement('div');
+    w.className = 'chain-wrapper';
+    w.style.animationDelay = `${delay}ms`;
 
-    function addSectionBanner(text) {
-        const banner = document.createElement('div');
-        banner.className = 'section-banner';
-        banner.textContent = text;
-        outputDiv.appendChild(banner);
-    }
+    const chainId = entries[0]?.entry?.evolution_chain_id || entries[0]?.entry?.id || '—';
+    const latestTs = entries.reduce((d,{entry}) => {
+        const t = entry?.created_at; return t&&t>d?t:d;
+    }, '');
 
-    function addEntryToUI(entry, options = {}) {
-        if (!entry) return;
-        const {
-            isWritten = false,
-            isHarvest = false,
-            isFind = false,
-            highlight = null,
-            index = 0
-        } = options;
+    w.innerHTML = `
+        <div class="chain-header">
+            <span class="chain-id">⟡ chain · ${esc(String(chainId).slice(0,8))}</span>
+            <span class="chain-count">${entries.length} band${entries.length!==1?'s':''} · ${fmtDate(latestTs)}</span>
+        </div>
+    `;
 
-        const card = document.createElement('div');
-        card.className = 'entry-card';
-        if (isHarvest) card.classList.add('harvest-card');
-        if (isFind) card.classList.add('find-card');
-        if (options.isSystem) card.classList.add('system-card');
-
-        // Stagger animation for grouped results
-        if (index > 0) {
-            card.style.animationDelay = `${index * 60}ms`;
+    entries.forEach(({band, entry}, i) => {
+        if (i > 0) {
+            const conn = document.createElement('div');
+            conn.className = 'band-connector';
+            w.appendChild(conn);
         }
-
-        const date = entry.created_at
-            ? new Date(entry.created_at).toLocaleString()
-            : 'this moment';
-
-        let icon, label;
-        if (isWritten)      { icon = '✍️'; label = 'inscribed'; }
-        else if (isHarvest) { icon = '⚱️'; label = 'harvest'; }
-        else if (isFind)    { icon = '🔍'; label = 'found'; }
-        else                { icon = '◈';  label = 'recollection'; }
-
-        const rawBody = entry.body || '';
-        const displayBody = highlight
-            ? highlightMatch(formatText(rawBody), highlight)
-            : escapeHtml(formatText(rawBody));
-
-        card.innerHTML = `
-            <div class="entry-meta">${icon} ${label} · ${date}</div>
-            <div class="entry-body">${displayBody}</div>
+        const el = document.createElement('div');
+        el.className = `band-entry ${band.name}`;
+        const raw = entry?.body || '';
+        const wc  = entry?.word_count || raw.split(/\s+/).filter(Boolean).length;
+        const bodyHtml = hlTerm ? highlight(fmt(raw), hlTerm) : esc(fmt(raw));
+        el.innerHTML = `
+            <div class="band-label">
+                <span class="dot" style="background:${band.color}"></span>
+                ${esc(band.name)}
+                <span class="wc-tag">${wc}w</span>
+            </div>
+            <div class="band-body">${bodyHtml}</div>
         `;
-        outputDiv.appendChild(card);
-        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        w.appendChild(el);
+    });
+
+    outputDiv.appendChild(w);
+    w.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function renderResultCard(band, entry, delay=0, hlTerm=null) {
+    const w = document.createElement('div');
+    w.className = 'result-wrapper';
+    w.style.animationDelay = `${delay}ms`;
+    w.style.borderColor = `rgba(${hexRgb(band.color)},0.18)`;
+
+    const raw  = entry?.body || '';
+    const wc   = entry?.word_count || raw.split(/\s+/).filter(Boolean).length;
+    const body = hlTerm ? highlight(fmt(raw), hlTerm) : esc(fmt(raw));
+
+    w.innerHTML = `
+        <div class="result-header" style="background:rgba(${hexRgb(band.color)},0.06); border-bottom:1px solid rgba(${hexRgb(band.color)},0.1);">
+            <span class="result-band-name" style="color:${band.color};">
+                <span style="width:6px;height:6px;border-radius:50%;background:${band.color};display:inline-block;"></span>
+                ${esc(band.name)}
+            </span>
+            <span class="result-date">${fmtDate(entry?.created_at)}</span>
+        </div>
+        <div class="result-body-wrap" style="border-left-color:${band.color};">
+            <div class="result-body">${body}</div>
+            <div class="result-wc">${wc}w</div>
+        </div>
+    `;
+    outputDiv.appendChild(w);
+    w.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+// ── Chain assembly ────────────────────────────────────────────────────────────
+async function buildChain(zeusEntry) {
+    const chainId = zeusEntry?.evolution_chain_id;
+    const result  = [];
+
+    if (chainId) {
+        await Promise.all(BANDS.map(async band => {
+            try {
+                const data = await sbGet(band.table,
+                    `?select=id,body,word_count,created_at,evolution_chain_id&evolution_chain_id=eq.${encodeURIComponent(chainId)}&limit=1`
+                );
+                if (data?.length > 0) result.push({ band, entry: data[0] });
+            } catch(_) {}
+        }));
     }
 
-    function addSystemCard(message) {
-        const card = document.createElement('div');
-        card.className = 'entry-card system-card';
-        card.innerHTML = `
-            <div class="entry-meta">◇ system</div>
-            <div class="entry-body" style="color:#8a9ab0; font-style: italic;">${escapeHtml(message)}</div>
-        `;
-        outputDiv.appendChild(card);
-        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // Fallback: time-window (90s) if chain id linkage yielded only zeus
+    if (result.length <= 1 && zeusEntry?.created_at) {
+        const ts = new Date(zeusEntry.created_at).getTime();
+        const lo = new Date(ts - 90000).toISOString();
+        const hi = new Date(ts + 90000).toISOString();
+        await Promise.all(BANDS.filter(b=>b.name!=='zeus').map(async band => {
+            try {
+                const data = await sbGet(band.table,
+                    `?select=id,body,word_count,created_at&created_at=gte.${encodeURIComponent(lo)}&created_at=lte.${encodeURIComponent(hi)}&order=created_at.asc&limit=1`
+                );
+                if (data?.length > 0) {
+                    // don't duplicate
+                    if (!result.some(r=>r.band.name===band.name)) result.push({ band, entry: data[0] });
+                }
+            } catch(_) {}
+        }));
     }
 
-    // ── API helpers ──────────────────────────────────────────────
+    // Ensure zeus itself is in
+    if (!result.some(r=>r.band.name==='zeus')) result.push({ band:BAND_BY_NAME['zeus'], entry:zeusEntry });
+    result.sort((a,b) => BAND_ORDER.indexOf(a.band.name) - BAND_ORDER.indexOf(b.band.name));
+    return result;
+}
 
-    async function apiFetch(path, opts = {}) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-            headers: {
-                'apikey': SUPABASE_ANON_KEY,
-                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                'Content-Type': 'application/json',
-                ...opts.headers
-            },
-            ...opts
-        });
-        if (!res.ok) {
-            const errText = await res.text();
-            throw new Error(`HTTP ${res.status}: ${errText}`);
+// ── Commands ──────────────────────────────────────────────────────────────────
+async function onRelic() {
+    setLoading('summoning a chain…');
+    try {
+        const data = await sbGet('zeus_entries','?select=id,body,word_count,created_at,evolution_chain_id&limit=60');
+        if (!data?.length) { addSystemCard('The archive is silent. Write something.'); setFeedback('archive empty'); return; }
+        const z = data[Math.floor(Math.random()*data.length)];
+        const chain = await buildChain(z);
+        renderChain(chain);
+        setFeedback(`chain surfaced · ${chain.length} band${chain.length!==1?'s':''}`);
+    } catch(e) { console.error(e); setFeedback('could not reach the archive', true); }
+}
+
+async function onHarvest() {
+    setLoading('harvesting recent chains…');
+    try {
+        const data = await sbGet('zeus_entries','?select=id,body,word_count,created_at,evolution_chain_id&order=created_at.desc&limit=5');
+        if (!data?.length) { addSystemCard('Nothing to harvest yet.'); setFeedback('archive empty'); return; }
+        addBanner(`⚱ harvest — ${data.length} most recent chain${data.length!==1?'s':''}`);
+        for (let i=0; i<data.length; i++) {
+            const chain = await buildChain(data[i]);
+            renderChain(chain, i*100);
         }
-        return res;
-    }
+        setFeedback(`${data.length} chain${data.length!==1?'s':''} harvested`);
+    } catch(e) { console.error(e); setFeedback('harvest failed', true); }
+}
 
-    // ── Commands ─────────────────────────────────────────────────
+async function onFind(term) {
+    if (!term?.trim()) { setFeedback('find what?', true); return; }
+    const t = term.trim();
+    setLoading(`searching all bands for "${t}"…`);
+    try {
+        const enc = encodeURIComponent(`%${t}%`);
+        const allResults = [];
+        await Promise.all(BANDS.map(async band => {
+            try {
+                const data = await sbGet(band.table,
+                    `?select=id,body,word_count,created_at&body=ilike.${enc}&order=created_at.desc&limit=10`
+                );
+                if (data?.length) data.forEach(entry => allResults.push({band, entry}));
+            } catch(_) {}
+        }));
 
-    async function onRelic() {
-        setLoading('searching the archive…');
-        try {
-            const res = await apiFetch(`${TABLE}?select=id,body,created_at&limit=50`);
-            const data = await res.json();
-            if (!data || data.length === 0) {
-                addSystemCard('The archive is silent. Be the first to write.');
-                setFeedback('archive is empty');
-                return;
-            }
-            const entry = data[Math.floor(Math.random() * data.length)];
-            addEntryToUI(entry);
-            setFeedback('a passage rises from the grimoir');
-        } catch (err) {
-            console.error(err);
-            setFeedback('could not reach the archive', true);
-        }
-    }
-
-    async function onWrite(text) {
-        if (!text || !text.trim()) {
-            setFeedback('cannot write an empty passage', true);
+        if (!allResults.length) {
+            addSystemCard(`No passages found containing "${t}".`);
+            setFeedback(`no matches for "${t}"`);
             return;
         }
-        const trimmed = text.trim();
-        setLoading('inscribing…');
-        const firstWords = trimmed.split(/\s+/).slice(0, 3).join('_');
-        const newEntry = {
-            label: `grimoir_${firstWords}_${Date.now()}`,
-            body: trimmed,
-            word_count: trimmed.split(/\s+/).length,
+
+        allResults.sort((a,b) => {
+            const oi = BAND_ORDER.indexOf(a.band.name) - BAND_ORDER.indexOf(b.band.name);
+            if (oi!==0) return oi;
+            return new Date(b.entry.created_at) - new Date(a.entry.created_at);
+        });
+
+        const bandSet = new Set(allResults.map(r=>r.band.name));
+        addBanner(`🔍 find: "${t}" — ${allResults.length} passage${allResults.length!==1?'s':''} across ${bandSet.size} band${bandSet.size!==1?'s':''}`);
+        allResults.forEach(({band, entry}, i) => renderResultCard(band, entry, i*45, t));
+        setFeedback(`${allResults.length} passage${allResults.length!==1?'s':''} found`);
+    } catch(e) { console.error(e); setFeedback('search failed', true); }
+}
+
+async function onBand(bandName) {
+    const b = BAND_BY_NAME[bandName?.toLowerCase()?.trim()];
+    if (!b) { setFeedback('unknown band · hermes apollo hephaestus demeter poseidon athena zeus', true); return; }
+    setLoading(`reading ${b.name}…`);
+    try {
+        const data = await sbGet(b.table,'?select=id,body,word_count,created_at&order=created_at.desc&limit=10');
+        if (!data?.length) { addSystemCard(`${b.name} is silent.`); setFeedback(`${b.name} has no entries`); return; }
+        addBanner(`◈ ${b.name} — ${data.length} passage${data.length!==1?'s':''}`);
+        data.forEach((entry,i) => renderResultCard(b, entry, i*50));
+        setFeedback(`${b.name} · ${data.length} entries`);
+    } catch(e) { console.error(e); setFeedback(`could not read ${b.name}`, true); }
+}
+
+async function onChain(id) {
+    if (!id?.trim()) { setFeedback('chain [id] required', true); return; }
+    const trimId = id.trim();
+    setLoading(`assembling chain ${trimId.slice(0,8)}…`);
+    try {
+        let zeusEntry = null;
+        // try by evolution_chain_id
+        try {
+            const d = await sbGet('zeus_entries',
+                `?select=id,body,word_count,created_at,evolution_chain_id&evolution_chain_id=eq.${encodeURIComponent(trimId)}&limit=1`
+            );
+            if (d?.length) zeusEntry = d[0];
+        } catch(_) {}
+        // try by zeus id
+        if (!zeusEntry) {
+            try {
+                const d = await sbGet('zeus_entries',
+                    `?select=id,body,word_count,created_at,evolution_chain_id&id=eq.${encodeURIComponent(trimId)}&limit=1`
+                );
+                if (d?.length) zeusEntry = d[0];
+            } catch(_) {}
+        }
+        if (!zeusEntry) { addSystemCard(`No chain found for: ${trimId}`); setFeedback('chain not found', true); return; }
+        const chain = await buildChain(zeusEntry);
+        renderChain(chain);
+        setFeedback(`chain assembled · ${chain.length} band${chain.length!==1?'s':''}`);
+    } catch(e) { console.error(e); setFeedback('chain retrieval failed', true); }
+}
+
+async function onWrite(text) {
+    if (!text?.trim()) { setFeedback('write what?', true); return; }
+    const trimmed = text.trim();
+    setLoading('inscribing…');
+    const label = `grimoir_${trimmed.split(/\s+/).slice(0,3).join('_')}_${Date.now()}`;
+    try {
+        await sbPost('zeus_entries', {
+            label, body:trimmed,
+            word_count: trimmed.split(/\s+/).filter(Boolean).length,
             created_at: new Date().toISOString()
-        };
-        try {
-            await apiFetch(TABLE, {
-                method: 'POST',
-                body: JSON.stringify(newEntry)
-            });
-            addEntryToUI({ body: trimmed, created_at: newEntry.created_at }, { isWritten: true });
-            setFeedback('✧ passage inscribed into the grimoir');
-        } catch (err) {
-            console.error(err);
-            setFeedback(`could not inscribe: ${err.message.slice(0, 80)}`, true);
-        }
-    }
-
-    async function onFind(term) {
-        if (!term || !term.trim()) {
-            setFeedback('find what? · try: find candle', true);
-            return;
-        }
-        const trimmed = term.trim();
-        setLoading(`searching for "${trimmed}"…`);
-        try {
-            // ilike performs case-insensitive pattern match in PostgREST
-            const encoded = encodeURIComponent(`%${trimmed}%`);
-            const res = await apiFetch(
-                `${TABLE}?select=id,body,created_at&body=ilike.${encoded}&order=created_at.desc&limit=20`
-            );
-            const data = await res.json();
-            if (!data || data.length === 0) {
-                addSystemCard(`No passages found containing "${trimmed}".`);
-                setFeedback(`no matches for "${trimmed}"`);
-                return;
-            }
-            addSectionBanner(`⟡ find: "${trimmed}" — ${data.length} passage${data.length !== 1 ? 's' : ''} found`);
-            data.forEach((entry, i) => {
-                addEntryToUI(entry, { isFind: true, highlight: trimmed, index: i });
-            });
-            setFeedback(`${data.length} passage${data.length !== 1 ? 's' : ''} surfaced`);
-        } catch (err) {
-            console.error(err);
-            setFeedback('search failed · archive unreachable', true);
-        }
-    }
-
-    async function onHarvest() {
-        setLoading('gathering recent passages…');
-        try {
-            const res = await apiFetch(
-                `${TABLE}?select=id,body,created_at&order=created_at.desc&limit=5`
-            );
-            const data = await res.json();
-            if (!data || data.length === 0) {
-                addSystemCard('The archive has no entries yet. Write something.');
-                setFeedback('nothing to harvest');
-                return;
-            }
-            addSectionBanner(`⚱️ harvest — ${data.length} most recent passage${data.length !== 1 ? 's' : ''}`);
-            data.forEach((entry, i) => {
-                addEntryToUI(entry, { isHarvest: true, index: i });
-            });
-            setFeedback(`${data.length} passage${data.length !== 1 ? 's' : ''} harvested`);
-        } catch (err) {
-            console.error(err);
-            setFeedback('harvest failed · archive unreachable', true);
-        }
-    }
-
-    function onHelp() {
-        helpOverlay.classList.add('visible');
-    }
-
-    // ── Dispatcher ───────────────────────────────────────────────
-
-    async function dispatchCommand(raw) {
-        const cmd = raw.trim();
-        const lower = cmd.toLowerCase();
-
-        if (lower === 'relic') {
-            await onRelic();
-        } else if (lower.startsWith('write ')) {
-            await onWrite(cmd.slice(6));
-        } else if (lower === 'find' || lower === 'find ') {
-            setFeedback('find what? · try: find candle', true);
-        } else if (lower.startsWith('find ')) {
-            await onFind(cmd.slice(5));
-        } else if (lower === 'harvest') {
-            await onHarvest();
-        } else if (lower === 'help') {
-            onHelp();
-        } else {
-            setFeedback(`unknown command: "${cmd}" · type help for reference`, true);
-        }
-    }
-
-    // ── Init ─────────────────────────────────────────────────────
-
-    window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('submitBtn').addEventListener('click', async () => {
-            const val = commandInput.value.trim();
-            if (val) await dispatchCommand(val);
-            commandInput.value = '';
-            commandInput.focus();
         });
+        const c = document.createElement('div');
+        c.className = 'entry-card inscribed';
+        c.innerHTML = `<div class="entry-meta">✍ inscribed · zeus · ${new Date().toLocaleString()}</div><div class="entry-body">${esc(fmt(trimmed))}</div>`;
+        outputDiv.appendChild(c);
+        c.scrollIntoView({behavior:'smooth',block:'nearest'});
+        setFeedback('✧ artifact inscribed into zeus');
+    } catch(e) { console.error(e); setFeedback(`could not inscribe: ${e.message.slice(0,80)}`, true); }
+}
 
-        commandInput.addEventListener('keypress', async (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const val = commandInput.value.trim();
-                if (val) await dispatchCommand(val);
-                commandInput.value = '';
-            }
-        });
+// ── Dispatch ──────────────────────────────────────────────────────────────────
+async function dispatch(raw) {
+    const cmd   = raw.trim();
+    const lower = cmd.toLowerCase();
+    const parts = cmd.split(/\s+/);
+    const verb  = parts[0].toLowerCase();
 
-        closeHelp.addEventListener('click', () => {
-            helpOverlay.classList.remove('visible');
-            commandInput.focus();
-        });
+    if (lower==='relic')    return onRelic();
+    if (lower==='harvest')  return onHarvest();
+    if (lower==='help')     { helpOverlay.classList.add('visible'); return; }
+    if (verb==='find')      return onFind(parts.slice(1).join(' '));
+    if (verb==='band')      return onBand(parts[1]);
+    if (verb==='chain')     return onChain(parts.slice(1).join(' '));
+    if (verb==='write')     return onWrite(parts.slice(1).join(' '));
+    setFeedback(`unknown: "${cmd}" · type help`, true);
+}
 
-        helpOverlay.addEventListener('click', (e) => {
-            if (e.target === helpOverlay) {
-                helpOverlay.classList.remove('visible');
-                commandInput.focus();
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && helpOverlay.classList.contains('visible')) {
-                helpOverlay.classList.remove('visible');
-                commandInput.focus();
-            }
-        });
-
-        setFeedback('grimoir ready · write or relic');
+// ── Boot ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('submitBtn').addEventListener('click', async () => {
+        const v = commandInput.value.trim();
+        if (v) await dispatch(v);
+        commandInput.value = '';
         commandInput.focus();
     });
+    commandInput.addEventListener('keypress', async e => {
+        if (e.key==='Enter') {
+            e.preventDefault();
+            const v = commandInput.value.trim();
+            if (v) await dispatch(v);
+            commandInput.value = '';
+        }
+    });
+    document.getElementById('closeHelp').addEventListener('click', () => {
+        helpOverlay.classList.remove('visible'); commandInput.focus();
+    });
+    helpOverlay.addEventListener('click', e => {
+        if (e.target===helpOverlay) { helpOverlay.classList.remove('visible'); commandInput.focus(); }
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key==='Escape'&&helpOverlay.classList.contains('visible')) {
+            helpOverlay.classList.remove('visible'); commandInput.focus();
+        }
+    });
+    setFeedback('grimoir ready · all seven bands active');
+    commandInput.focus();
+});
 </script>
 </body>
 </html>
