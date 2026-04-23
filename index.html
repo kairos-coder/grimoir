@@ -228,7 +228,6 @@
     const SUPABASE_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
 
-    // Use zeus_entries - we know it has data and works for reads
     const TABLE = 'zeus_entries';
 
     const outputDiv = document.getElementById('outputArea');
@@ -259,7 +258,7 @@
         const label = isWritten ? 'inscribed' : 'recollection';
         card.innerHTML = `
             <div class="entry-meta">${icon} ${label} · ${date}</div>
-            <div class="entry-body">${formatText(entry.body || entry.text)}</div>
+            <div class="entry-body">${formatText(entry.body)}</div>
         `;
         outputDiv.appendChild(card);
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -292,9 +291,15 @@
             return;
         }
 
-        // Only use columns that definitely exist in zeus_entries
+        // Generate a simple label from the first few words
+        const firstWords = text.trim().split(/\s+/).slice(0, 3).join('_');
+        const label = `grimoir_${firstWords}_${Date.now()}`;
+        const wordCount = text.trim().split(/\s+/).length;
+
         const newEntry = {
+            label: label,
             body: text.trim(),
+            word_count: wordCount,
             created_at: new Date().toISOString()
         };
 
