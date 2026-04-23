@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Ealdforn Grimoir</title>
+
+  <style>
+    body {
+      background: #0b0b10;
+      color: #e6e0d4;
+      font-family: Georgia, serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    #ui {
+      max-width: 820px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    #header {
+      border-bottom: 1px solid #333;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+    }
+
+    #header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    #mode {
+      font-size: 12px;
+      opacity: 0.6;
+    }
+
+    #output {
+      min-height: 65vh;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      padding: 10px 0;
+    }
+
+    #input-bar {
+      display: flex;
+      margin-top: 10px;
+      border-top: 1px solid #333;
+      padding-top: 10px;
+    }
+
+    #command {
+      flex: 1;
+      padding: 10px;
+      background: #111;
+      border: 1px solid #333;
+      color: #fff;
+      outline: none;
+    }
+
+    button {
+      margin-left: 10px;
+      padding: 10px 14px;
+      background: #1a1a1f;
+      border: 1px solid #333;
+      color: #e6e0d4;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #222;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="ui">
+    <div id="header">
+      <h1>Ealdforn Grimoir</h1>
+      <div id="mode">Abbey Lens</div>
+    </div>
+
+    <div id="output"></div>
+
+    <div id="input-bar">
+      <input id="command" placeholder="whisper into the Grimoir..." />
+      <button onclick="runCommand()">invoke</button>
+    </div>
+  </div>
+
+  <script>
+    // --- CONFIG ---
+    const SUPABASE_URL = "YOUR_URL";
+    const SUPABASE_KEY = "YOUR_KEY";
+
+    let mode = "abbey";
+
+    function setMode(newMode) {
+      mode = newMode;
+      document.getElementById("mode").innerText =
+        newMode === "abbey" ? "Abbey Lens" : "Glimthaven Lens";
+
+      appendOutput(`\n[Mode shifted: ${newMode}]`);
+    }
+
+    // --- COMMAND ROUTER ---
+    async function runCommand() {
+      const input = document.getElementById("command").value;
+      document.getElementById("command").value = "";
+
+      if (!input) return;
+
+      if (input === "mode grimoir") {
+        setMode("glimthaven");
+        return;
+      }
+
+      if (input === "mode abbey") {
+        setMode("abbey");
+        return;
+      }
+
+      if (input === "relic") {
+        const entry = await fetchRelic();
+        renderEntry(entry);
+        return;
+      }
+
+      appendOutput("> " + input);
+    }
+
+    // --- DATA LAYER ---
+    async function fetchRelic() {
+      const table = (mode === "abbey")
+        ? pickAbbeyTable()
+        : pickGlimthavenTable();
+
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/${table}?select=*&limit=1&order=created_at.desc`,
+        {
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`
+          }
+        }
+      );
+
+      const data = await res.json();
+      return data?.[0] || { text: "…the Grimoir is silent." };
+    }
+
+    function pickAbbeyTable() {
+      const options = ["demeter_entries", "athena_entries"];
+      return options[Math.floor(Math.random() * options.length)];
+    }
+
+    function pickGlimthavenTable() {
+      const options = ["poseidon_entries", "zeus_entries"];
+      return options[Math.floor(Math.random() * options.length)];
+    }
+
+    // --- RENDERING ---
+    function renderEntry(entry) {
+      let text = entry.text || "…";
+
+      if (mode === "glimthaven") {
+        text = "✧ GLIMHAVEN RECOLLECTION ✧\n\n" + text;
+      } else {
+        text = "✧ ABBEY RECORD ✧\n\n" + text;
+      }
+
+      appendOutput("\n" + text);
+    }
+
+    // --- OUTPUT ---
+    function appendOutput(text) {
+      const out = document.getElementById("output");
+      out.innerText += "\n" + text;
+      out.scrollTop = out.scrollHeight;
+    }
+
+    // --- ENTER KEY SUPPORT ---
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") runCommand();
+    });
+  </script>
+</body>
+</html>
