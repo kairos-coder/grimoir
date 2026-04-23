@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Ealdforn Grimoir · Living Archive</title>
+    <title>Ealdforn Abbey · The Grimoir</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -14,22 +14,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Palatino', 'Georgia', serif;
+            font-family: 'Palatino', 'Georgia', 'Times New Roman', serif;
             padding: 1rem;
         }
 
         .grimoir {
             max-width: 860px;
             width: 100%;
-            background: rgba(8, 10, 16, 0.78);
-            backdrop-filter: blur(2px);
-            border: 1px solid rgba(90, 110, 130, 0.25);
+            background: rgba(8, 10, 16, 0.82);
+            backdrop-filter: blur(3px);
+            border: 1px solid rgba(90, 110, 130, 0.3);
             border-radius: 2rem;
             display: flex;
             flex-direction: column;
             height: 85vh;
             min-height: 560px;
-            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.02);
         }
 
         .grimoir-header {
@@ -39,12 +39,11 @@
             justify-content: space-between;
             align-items: baseline;
             flex-wrap: wrap;
-            gap: 0.6rem;
         }
 
         .title {
             font-size: 1.2rem;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             font-weight: 400;
             background: linear-gradient(135deg, #ebe9e0, #a7b1b8);
             background-clip: text;
@@ -52,14 +51,11 @@
             color: transparent;
         }
 
-        .lens-badge {
-            font-size: 0.7rem;
+        .sub {
+            font-size: 0.65rem;
             font-family: monospace;
-            background: #1a1f2a;
-            padding: 0.2rem 0.8rem;
-            border-radius: 40px;
-            border-left: 3px solid #7a6a4a;
-            color: #c0b99a;
+            color: #6a7a8a;
+            letter-spacing: 1px;
         }
 
         .output-area {
@@ -71,38 +67,40 @@
             color: #dbdee6;
         }
 
-        .relic-card {
-            background: rgba(15, 18, 26, 0.6);
+        .entry-card {
+            background: rgba(15, 18, 26, 0.55);
             border-radius: 1.2rem;
             padding: 1.2rem 1.4rem;
             margin-bottom: 1.5rem;
             border: 1px solid rgba(210, 190, 150, 0.2);
-            backdrop-filter: blur(4px);
-        }
-
-        .relic-card.abbey {
+            backdrop-filter: blur(2px);
             border-left: 4px solid #6b8e5e;
+            transition: all 0.2s ease;
         }
 
-        .relic-card.glimhaven {
-            border-left: 4px solid #2a5e8a;
+        .entry-card.written {
+            border-left: 4px solid #c9a87c;
+            background: rgba(25, 28, 38, 0.7);
         }
 
-        .relic-meta {
-            font-size: 0.7rem;
+        .entry-meta {
+            font-size: 0.65rem;
             font-family: monospace;
             color: #8696aa;
             margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
         }
 
-        .relic-body {
+        .entry-body {
             font-size: 1rem;
             line-height: 1.55;
             white-space: pre-wrap;
+            color: #e0e2e9;
         }
 
-        .abbey .relic-body { color: #e0e2e9; }
-        .glimhaven .relic-body { font-style: italic; color: #cbd5e9; }
+        .entry-card.written .entry-body {
+            color: #f0e6d2;
+        }
 
         .command-section {
             background: #05070c;
@@ -126,7 +124,7 @@
             border: 1px solid #2a2f3a;
             color: #f0f2f5;
             padding: 0.6rem 1rem;
-            font-family: monospace;
+            font-family: 'SF Mono', monospace;
             font-size: 0.85rem;
             border-radius: 60px;
             outline: none;
@@ -170,8 +168,8 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(5, 7, 12, 0.95);
-            backdrop-filter: blur(6px);
+            background: rgba(5, 7, 12, 0.96);
+            backdrop-filter: blur(8px);
             z-index: 100;
             display: flex;
             align-items: center;
@@ -187,7 +185,7 @@
         }
 
         .help-panel {
-            max-width: 500px;
+            max-width: 480px;
             width: 85%;
             background: #0f131e;
             border: 1px solid #5f6a7a;
@@ -197,7 +195,7 @@
         }
 
         .help-panel h3 {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             border-bottom: 1px solid #5f6a7a;
             display: inline-block;
             margin-bottom: 1.2rem;
@@ -243,52 +241,52 @@
 
 <div class="grimoir">
     <div class="grimoir-header">
-        <div class="title">Ealdforn Grimoir</div>
-        <div class="lens-badge" id="lensBadge">⚜️ ABBEY LENS</div>
+        <div class="title">Ealdforn Abbey · The Grimoir</div>
+        <div class="sub">— codex aethernum —</div>
     </div>
 
     <div class="output-area" id="outputArea">
-        <div class="relic-card abbey">
-            <div class="relic-meta">◈ ealdforn ◈</div>
-            <div class="relic-body">The archive remembers. Type <span style="color:#c3b87c;">relic</span> to draw from the current lens.<br> 
-            <span style="color:#9ab3c9;">write [text]</span> to inscribe a new memory.<br>
+        <div class="entry-card">
+            <div class="entry-meta">◈ folio · initium ◈</div>
+            <div class="entry-body">The Abbey archives breathe. <span style="color:#c3b87c;">relic</span> to read a forgotten entry.<br>
+            <span style="color:#9ab3c9;">write [text]</span> to inscribe a new passage into the grimoir.<br>
             <span style="color:#9ab3c9;">help</span> to consult the codex.</div>
         </div>
     </div>
 
     <div class="command-section">
         <span class="prompt">⟡</span>
-        <input type="text" id="commandInput" placeholder="relic · write the river remembers · mode abbey · help" autofocus>
+        <input type="text" id="commandInput" placeholder="relic · write the candle remembers · help" autofocus>
         <button id="submitBtn">invoke</button>
     </div>
     <div style="text-align: right;">
-        <span class="sys-feedback" id="sysFeedback">⚙️ waiting</span>
+        <span class="sys-feedback" id="sysFeedback">⚙️ awaiting scribe</span>
     </div>
 </div>
 
 <div id="helpOverlay" class="help-overlay">
     <div class="help-panel">
         <button class="close-help" id="closeHelpBtn">✕</button>
-        <h3>✧ Grimoir Commands ✧</h3>
+        <h3>✧ The Codex ✧</h3>
         <ul>
-            <li><span class="cmd">relic</span> — draw a memory fragment from current lens</li>
-            <li><span class="cmd">write [text]</span> — add a new entry to the current lens</li>
-            <li><span class="cmd">mode abbey</span> — switch to Abbey (Demeter + Athena)</li>
-            <li><span class="cmd">mode glimhaven</span> — switch to Glimhaven (Poseidon + Zeus)</li>
+            <li><span class="cmd">relic</span> — draw a passage from the Abbey archive</li>
+            <li><span class="cmd">write [text]</span> — inscribe a new passage into the grimoir</li>
             <li><span class="cmd">help</span> — show this codex</li>
         </ul>
-        <p style="margin-top: 1rem; font-size:0.7rem; color:#8696aa;">† inscription becomes memory †</p>
+        <p style="margin-top: 1rem; font-size:0.7rem; color:#8696aa;">† what is written becomes memory †</p>
     </div>
 </div>
 
 <script>
+    // Replace with your Supabase credentials
     const SUPABASE_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
 
-    let currentMode = 'abbey';
+    // Tables for Abbey mode: Demeter (growth) and Athena (wisdom)
+    const TABLES = ['demeter_entries', 'athena_entries'];
+
     const outputDiv = document.getElementById('outputArea');
     const commandInput = document.getElementById('commandInput');
-    const lensBadge = document.getElementById('lensBadge');
     const sysFeedbackSpan = document.getElementById('sysFeedback');
     const helpOverlay = document.getElementById('helpOverlay');
 
@@ -296,42 +294,35 @@
         sysFeedbackSpan.innerHTML = isError ? `⚠️ ${msg}` : `✦ ${msg}`;
         setTimeout(() => {
             if (sysFeedbackSpan.innerHTML === `✦ ${msg}` || sysFeedbackSpan.innerHTML === `⚠️ ${msg}`) {
-                sysFeedbackSpan.innerHTML = `⚙️ ready`;
+                sysFeedbackSpan.innerHTML = `⚙️ awaiting scribe`;
             }
-        }, 2500);
+        }, 2800);
     }
 
-    function formatEntryBody(rawText, mode) {
-        if (!rawText) return '… fragment lingering …';
+    function formatEntryBody(rawText) {
+        if (!rawText) return '… a passage lost to time …';
         const trimmed = rawText.trim();
-        if (mode === 'abbey') {
-            if (trimmed.startsWith('Within the Abbey')) return trimmed;
-            return `Within the Abbey, ${trimmed.charAt(0).toLowerCase() + trimmed.slice(1)}`;
-        } else {
-            if (trimmed.startsWith('A Glimhaven recollection')) return trimmed;
-            return `A Glimhaven recollection: ${trimmed.charAt(0).toLowerCase() + trimmed.slice(1)}`;
-        }
+        if (trimmed.startsWith('Within the Abbey,')) return trimmed;
+        return `Within the Abbey, ${trimmed.charAt(0).toLowerCase() + trimmed.slice(1)}`;
     }
 
-    function addRelicToUI(entry, mode, isWritten = false) {
+    function addEntryToUI(entry, isWritten = false) {
         if (!entry) return;
         const card = document.createElement('div');
-        card.className = `relic-card ${mode}`;
-        const date = entry.created_at ? new Date(entry.created_at).toLocaleString() : 'just now';
-        const metaIcon = mode === 'abbey' ? '✧' : '◈';
-        let metaLabel = mode === 'abbey' ? 'Abbey archival' : 'Glimhaven shard';
-        if (isWritten) metaLabel = mode === 'abbey' ? 'inscribed into Abbey' : 'inscribed into Glimhaven';
+        card.className = 'entry-card' + (isWritten ? ' written' : '');
+        const date = entry.created_at ? new Date(entry.created_at).toLocaleString() : 'this hour';
+        const metaIcon = isWritten ? '✍️' : '◈';
+        const metaLabel = isWritten ? 'inscribed by a scribe' : 'archive recollection';
         card.innerHTML = `
-            <div class="relic-meta">${metaIcon} ${metaLabel} · ${date}</div>
-            <div class="relic-body">${formatEntryBody(entry.text || entry.body, mode)}</div>
+            <div class="entry-meta">${metaIcon} ${metaLabel} · ${date}</div>
+            <div class="entry-body">${formatEntryBody(entry.text || entry.body)}</div>
         `;
         outputDiv.appendChild(card);
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    async function fetchRelic(mode) {
-        const tables = mode === 'abbey' ? ['demeter_entries', 'athena_entries'] : ['poseidon_entries', 'zeus_entries'];
-        const randomTable = tables[Math.floor(Math.random() * tables.length)];
+    async function fetchRandomEntry() {
+        const randomTable = TABLES[Math.floor(Math.random() * TABLES.length)];
         const url = `${SUPABASE_URL}/rest/v1/${randomTable}?select=id,text,body,created_at&limit=15`;
         try {
             const res = await fetch(url, {
@@ -348,23 +339,28 @@
     }
 
     async function onRelic() {
-        setFeedback(`reading from ${currentMode === 'abbey' ? 'Demeter/Athena' : 'Poseidon/Zeus'}...`);
-        const relic = await fetchRelic(currentMode);
-        if (relic) {
-            addRelicToUI(relic, currentMode, false);
-            setFeedback(`relic drawn from ${currentMode === 'abbey' ? 'Abbey archives' : 'Glimhaven depth'}`);
+        setFeedback('turning pages of the grimoir...');
+        const entry = await fetchRandomEntry();
+        if (entry) {
+            addEntryToUI(entry, false);
+            setFeedback('a passage rises from the archive');
         } else {
-            addRelicToUI({ text: `The ${currentMode} lens is silent. No entries found.`, created_at: null }, currentMode, false);
+            addEntryToUI({ text: 'The Abbey whispers, but no passages yet remain. Write the first.', created_at: null }, false);
         }
     }
 
     async function writeEntry(text) {
         if (!text || !text.trim()) {
-            setFeedback("cannot write an empty memory", true);
+            setFeedback('the scribe cannot write emptiness', true);
             return;
         }
-        const targetTable = currentMode === 'abbey' ? 'demeter_entries' : 'poseidon_entries';
-        const newEntry = { text: text.trim(), created_at: new Date().toISOString(), source: "user", mode: currentMode };
+        // Write to Demeter (the growing archive)
+        const targetTable = 'demeter_entries';
+        const newEntry = {
+            text: text.trim(),
+            created_at: new Date().toISOString(),
+            source: 'scribe'
+        };
         const url = `${SUPABASE_URL}/rest/v1/${targetTable}`;
         try {
             const res = await fetch(url, {
@@ -377,18 +373,11 @@
                 body: JSON.stringify(newEntry)
             });
             if (!res.ok) throw new Error();
-            setFeedback(currentMode === 'abbey' ? '✧ entry written to Demeter' : '◈ entry written to Poseidon');
-            addRelicToUI({ text: text.trim(), created_at: new Date().toISOString() }, currentMode, true);
+            setFeedback('✧ passage inscribed into the grimoir');
+            addEntryToUI({ text: text.trim(), created_at: new Date().toISOString() }, true);
         } catch {
-            setFeedback(`failed to inscribe into ${targetTable}`, true);
+            setFeedback('the Abbey could not record the passage', true);
         }
-    }
-
-    function setMode(mode) {
-        if (mode !== 'abbey' && mode !== 'glimhaven') return;
-        currentMode = mode;
-        lensBadge.innerHTML = currentMode === 'abbey' ? '⚜️ ABBEY LENS · demeter/athena' : '🌊 GLIMHAVEN LENS · poseidon/zeus';
-        setFeedback(`lens switched to ${currentMode === 'abbey' ? 'Abbey' : 'Glimhaven'}`);
     }
 
     function showHelp() { helpOverlay.classList.add('visible'); }
@@ -397,16 +386,14 @@
     function dispatchCommand(cmd) {
         const trimmed = cmd.trim().toLowerCase();
         if (trimmed === 'help') { showHelp(); return; }
-        if (trimmed === 'mode abbey') { setMode('abbey'); return; }
-        if (trimmed === 'mode glimhaven') { setMode('glimhaven'); return; }
         if (trimmed === 'relic') { onRelic(); return; }
         if (trimmed.startsWith('write ')) {
             const writeText = cmd.slice(6).trim();
             if (writeText) writeEntry(writeText);
-            else setFeedback("write what? e.g., write the river remembers", true);
+            else setFeedback('write what? e.g., write the river remembers', true);
             return;
         }
-        setFeedback(`unknown command: ${cmd} · type 'help'`, true);
+        setFeedback(`the Abbey does not know "${cmd}" · type 'help'`, true);
     }
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -427,7 +414,7 @@
         });
         document.getElementById('closeHelpBtn').addEventListener('click', hideHelp);
         helpOverlay.addEventListener('click', (e) => { if (e.target === helpOverlay) hideHelp(); });
-        setFeedback('grimoir ready · write, relic, or invoke help');
+        setFeedback('the grimoir awaits');
         commandInput.focus();
     });
 </script>
