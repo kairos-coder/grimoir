@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Ealdforn Grimoir · Working Archive</title>
+    <title>Ealdforn Abbey · The Grimoir</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -79,11 +79,6 @@
             font-size: 0.95rem;
             line-height: 1.5;
             color: #e0e2e9;
-        }
-
-        .entry-card.written {
-            border-left-color: #c9a87c;
-            background: rgba(25, 28, 38, 0.7);
         }
 
         .command-section {
@@ -215,13 +210,13 @@
     <div class="output-area" id="outputArea">
         <div class="entry-card">
             <div class="entry-meta">◈ initium ◈</div>
-            <div class="entry-body">Type <span style="color:#c3b87c;">relic</span> to read. <span style="color:#9ab3c9;">write [text]</span> to inscribe. <span style="color:#9ab3c9;">help</span> for commands.</div>
+            <div class="entry-body">Type <span style="color:#c3b87c;">relic</span> to read. <span style="color:#9ab3c9;">write [text]</span> to inscribe.</div>
         </div>
     </div>
 
     <div class="command-section">
         <span class="prompt">⟡</span>
-        <input type="text" id="commandInput" placeholder="relic · write the candle remembers · help" autofocus>
+        <input type="text" id="commandInput" placeholder="relic · write the candle remembers" autofocus>
         <button id="submitBtn">invoke</button>
     </div>
     <div style="text-align: right;">
@@ -229,35 +224,16 @@
     </div>
 </div>
 
-<div id="helpOverlay" class="help-overlay">
-    <div class="help-panel">
-        <button class="close-help" id="closeHelpBtn">✕</button>
-        <h3>✧ Commands ✧</h3>
-        <ul>
-            <li><span class="cmd">relic</span> — read a random passage</li>
-            <li><span class="cmd">write [text]</span> — add a new passage</li>
-            <li><span class="cmd">help</span> — this menu</li>
-        </ul>
-        <p style="margin-top: 1rem; font-size:0.7rem; color:#8696aa;">† what is written becomes memory †</p>
-    </div>
-</div>
-
 <script>
-    // ============================================================
-    // EALDFORN GRIMOIR - WORKING ARCHIVE
-    // Direct database interaction with proper error handling
-    // ============================================================
-
     const SUPABASE_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
 
-    // Use a single table that definitely exists and has data
+    // Use zeus_entries - we know it has data and works for reads
     const TABLE = 'zeus_entries';
 
     const outputDiv = document.getElementById('outputArea');
     const commandInput = document.getElementById('commandInput');
     const sysFeedback = document.getElementById('sysFeedback');
-    const helpOverlay = document.getElementById('helpOverlay');
 
     function setFeedback(msg, isError = false) {
         sysFeedback.innerHTML = isError ? `⚠️ ${msg}` : `✦ ${msg}`;
@@ -277,7 +253,7 @@
     function addEntryToUI(entry, isWritten = false) {
         if (!entry) return;
         const card = document.createElement('div');
-        card.className = 'entry-card' + (isWritten ? ' written' : '');
+        card.className = 'entry-card';
         const date = entry.created_at ? new Date(entry.created_at).toLocaleString() : 'this moment';
         const icon = isWritten ? '✍️' : '◈';
         const label = isWritten ? 'inscribed' : 'recollection';
@@ -290,8 +266,7 @@
     }
 
     async function fetchRandomEntry() {
-        // Simple fetch without complex ordering
-        const url = `${SUPABASE_URL}/rest/v1/${TABLE}?select=id,body,created_at&limit=20`;
+        const url = `${SUPABASE_URL}/rest/v1/${TABLE}?select=id,body,created_at&limit=30`;
         try {
             const res = await fetch(url, {
                 headers: {
@@ -299,17 +274,14 @@
                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                 }
             });
-            if (!res.ok) {
-                const text = await res.text();
-                throw new Error(`HTTP ${res.status}: ${text}`);
-            }
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const data = await res.json();
             if (!data || data.length === 0) return null;
             const randomIndex = Math.floor(Math.random() * data.length);
             return data[randomIndex];
         } catch (err) {
             console.error('Fetch error:', err);
-            setFeedback(`could not reach archive: ${err.message}`, true);
+            setFeedback(`could not reach archive`, true);
             return null;
         }
     }
@@ -320,10 +292,10 @@
             return;
         }
 
+        // Only use columns that definitely exist in zeus_entries
         const newEntry = {
             body: text.trim(),
-            created_at: new Date().toISOString(),
-            source: 'grimoir'
+            created_at: new Date().toISOString()
         };
 
         const url = `${SUPABASE_URL}/rest/v1/${TABLE}`;
@@ -341,11 +313,11 @@
                 const errText = await res.text();
                 throw new Error(`HTTP ${res.status}: ${errText}`);
             }
-            setFeedback('✧ passage inscribed');
+            setFeedback('✧ passage inscribed into the grimoir');
             addEntryToUI({ body: text.trim(), created_at: new Date().toISOString() }, true);
         } catch (err) {
             console.error('Write error:', err);
-            setFeedback(`could not inscribe: ${err.message}`, true);
+            setFeedback(`could not inscribe: ${err.message.slice(0, 80)}`, true);
         }
     }
 
@@ -360,12 +332,8 @@
         }
     }
 
-    function showHelp() { helpOverlay.classList.add('visible'); }
-    function hideHelp() { helpOverlay.classList.remove('visible'); }
-
     async function dispatchCommand(cmd) {
         const trimmed = cmd.trim().toLowerCase();
-        if (trimmed === 'help') { showHelp(); return; }
         if (trimmed === 'relic') { await onRelic(); return; }
         if (trimmed.startsWith('write ')) {
             const writeText = cmd.slice(6).trim();
@@ -373,10 +341,9 @@
             else setFeedback('write what?', true);
             return;
         }
-        setFeedback(`unknown command: "${cmd}" · try 'help'`, true);
+        setFeedback(`unknown command: "${cmd}" · try 'relic' or 'write [text]'`, true);
     }
 
-    // Initialize
     window.addEventListener('DOMContentLoaded', () => {
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.addEventListener('click', async () => {
@@ -393,8 +360,6 @@
                 commandInput.value = '';
             }
         });
-        document.getElementById('closeHelpBtn').addEventListener('click', hideHelp);
-        helpOverlay.addEventListener('click', (e) => { if (e.target === helpOverlay) hideHelp(); });
         setFeedback('grimoir ready · write or relic');
         commandInput.focus();
     });
