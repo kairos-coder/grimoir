@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Ealdforn Abbey · The Grimoir</title>
+    <title>Ealdforn Grimoir · Working Archive</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -14,14 +14,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Palatino', 'Georgia', 'Times New Roman', serif;
+            font-family: 'Palatino', 'Georgia', serif;
             padding: 1rem;
         }
 
         .grimoir {
             max-width: 860px;
             width: 100%;
-            background: rgba(8, 10, 16, 0.82);
+            background: rgba(8, 10, 16, 0.85);
             backdrop-filter: blur(3px);
             border: 1px solid rgba(90, 110, 130, 0.3);
             border-radius: 2rem;
@@ -29,7 +29,6 @@
             flex-direction: column;
             height: 85vh;
             min-height: 560px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.02);
         }
 
         .grimoir-header {
@@ -38,13 +37,11 @@
             display: flex;
             justify-content: space-between;
             align-items: baseline;
-            flex-wrap: wrap;
         }
 
         .title {
             font-size: 1.2rem;
             letter-spacing: 3px;
-            font-weight: 400;
             background: linear-gradient(135deg, #ebe9e0, #a7b1b8);
             background-clip: text;
             -webkit-background-clip: text;
@@ -55,45 +52,38 @@
             font-size: 0.65rem;
             font-family: monospace;
             color: #6a7a8a;
-            letter-spacing: 1px;
         }
 
         .output-area {
             flex: 1;
             overflow-y: auto;
             padding: 1.6rem;
-            font-size: 1rem;
-            line-height: 1.65;
-            color: #dbdee6;
         }
 
         .entry-card {
-            background: rgba(15, 18, 26, 0.55);
-            border-radius: 1.2rem;
-            padding: 1.2rem 1.4rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid rgba(210, 190, 150, 0.2);
-            backdrop-filter: blur(2px);
-            border-left: 4px solid #6b8e5e;
-        }
-
-        .entry-card.written {
-            border-left: 4px solid #c9a87c;
-            background: rgba(25, 28, 38, 0.7);
+            background: rgba(15, 18, 26, 0.6);
+            border-radius: 1rem;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid #6b8e5e;
         }
 
         .entry-meta {
             font-size: 0.65rem;
             font-family: monospace;
             color: #8696aa;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
 
         .entry-body {
-            font-size: 1rem;
-            line-height: 1.55;
-            white-space: pre-wrap;
+            font-size: 0.95rem;
+            line-height: 1.5;
             color: #e0e2e9;
+        }
+
+        .entry-card.written {
+            border-left-color: #c9a87c;
+            background: rgba(25, 28, 38, 0.7);
         }
 
         .command-section {
@@ -107,7 +97,6 @@
 
         .prompt {
             font-family: monospace;
-            font-weight: 600;
             color: #9eb2c5;
             font-size: 0.9rem;
         }
@@ -124,24 +113,17 @@
             outline: none;
         }
 
-        #commandInput:focus {
-            border-color: #7a6a4a;
-        }
-
         button {
             background: #1e2532;
             border: none;
             color: #ddd3c2;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 1.2rem;
             border-radius: 40px;
-            font-family: inherit;
-            font-size: 0.75rem;
             cursor: pointer;
         }
 
         button:hover {
             background: #2f384a;
-            color: white;
         }
 
         .sys-feedback {
@@ -152,7 +134,7 @@
             padding: 0.25rem 0.8rem;
             border-radius: 30px;
             display: inline-block;
-            margin: 0.2rem 1.2rem 0.8rem;
+            margin: 0.2rem 1.2rem 0.5rem;
             text-align: right;
         }
 
@@ -179,26 +161,26 @@
         }
 
         .help-panel {
-            max-width: 480px;
+            max-width: 450px;
             width: 85%;
             background: #0f131e;
             border: 1px solid #5f6a7a;
-            border-radius: 1.8rem;
-            padding: 1.8rem;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
             position: relative;
         }
 
         .help-panel h3 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             border-bottom: 1px solid #5f6a7a;
             display: inline-block;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             color: #cfd9e6;
         }
 
         .help-panel li {
-            margin-bottom: 0.9rem;
-            font-size: 0.9rem;
+            margin-bottom: 0.7rem;
+            font-size: 0.85rem;
             color: #cddbe9;
             border-left: 2px solid #5f6a7a;
             padding-left: 0.8rem;
@@ -208,43 +190,32 @@
         .help-panel .cmd {
             font-family: monospace;
             color: #e2bc7c;
-            font-weight: 600;
         }
 
         .close-help {
             position: absolute;
-            top: 1rem;
-            right: 1.2rem;
-            font-size: 1.5rem;
+            top: 0.8rem;
+            right: 1rem;
+            font-size: 1.3rem;
             cursor: pointer;
             color: #a0abbc;
             background: none;
             border: none;
         }
-
-        .close-help:hover {
-            color: #eeddaa;
-        }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #0a0d14; }
-        ::-webkit-scrollbar-thumb { background: #2b3342; border-radius: 6px; }
     </style>
 </head>
 <body>
 
 <div class="grimoir">
     <div class="grimoir-header">
-        <div class="title">Ealdforn Abbey · The Grimoir</div>
-        <div class="sub">— codex aethernum —</div>
+        <div class="title">Ealdforn Grimoir</div>
+        <div class="sub">— working archive —</div>
     </div>
 
     <div class="output-area" id="outputArea">
         <div class="entry-card">
-            <div class="entry-meta">◈ folio · initium ◈</div>
-            <div class="entry-body">The Abbey archives breathe. <span style="color:#c3b87c;">relic</span> to read a forgotten entry.<br>
-            <span style="color:#9ab3c9;">write [text]</span> to inscribe a new passage into the grimoir.<br>
-            <span style="color:#9ab3c9;">help</span> to consult the codex.</div>
+            <div class="entry-meta">◈ initium ◈</div>
+            <div class="entry-body">Type <span style="color:#c3b87c;">relic</span> to read. <span style="color:#9ab3c9;">write [text]</span> to inscribe. <span style="color:#9ab3c9;">help</span> for commands.</div>
         </div>
     </div>
 
@@ -254,106 +225,108 @@
         <button id="submitBtn">invoke</button>
     </div>
     <div style="text-align: right;">
-        <span class="sys-feedback" id="sysFeedback">⚙️ awaiting scribe</span>
+        <span class="sys-feedback" id="sysFeedback">⚙️ ready</span>
     </div>
 </div>
 
 <div id="helpOverlay" class="help-overlay">
     <div class="help-panel">
         <button class="close-help" id="closeHelpBtn">✕</button>
-        <h3>✧ The Codex ✧</h3>
+        <h3>✧ Commands ✧</h3>
         <ul>
-            <li><span class="cmd">relic</span> — draw a passage from the Abbey archive</li>
-            <li><span class="cmd">write [text]</span> — inscribe a new passage into the grimoir</li>
-            <li><span class="cmd">help</span> — show this codex</li>
+            <li><span class="cmd">relic</span> — read a random passage</li>
+            <li><span class="cmd">write [text]</span> — add a new passage</li>
+            <li><span class="cmd">help</span> — this menu</li>
         </ul>
         <p style="margin-top: 1rem; font-size:0.7rem; color:#8696aa;">† what is written becomes memory †</p>
     </div>
 </div>
 
 <script>
+    // ============================================================
+    // EALDFORN GRIMOIR - WORKING ARCHIVE
+    // Direct database interaction with proper error handling
+    // ============================================================
+
     const SUPABASE_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
 
-    // Tables for Abbey mode: Demeter (growth) and Athena (wisdom)
-    const TABLES = ['demeter_entries', 'athena_entries'];
+    // Use a single table that definitely exists and has data
+    const TABLE = 'zeus_entries';
 
     const outputDiv = document.getElementById('outputArea');
     const commandInput = document.getElementById('commandInput');
-    const sysFeedbackSpan = document.getElementById('sysFeedback');
+    const sysFeedback = document.getElementById('sysFeedback');
     const helpOverlay = document.getElementById('helpOverlay');
 
     function setFeedback(msg, isError = false) {
-        sysFeedbackSpan.innerHTML = isError ? `⚠️ ${msg}` : `✦ ${msg}`;
+        sysFeedback.innerHTML = isError ? `⚠️ ${msg}` : `✦ ${msg}`;
         setTimeout(() => {
-            if (sysFeedbackSpan.innerHTML === `✦ ${msg}` || sysFeedbackSpan.innerHTML === `⚠️ ${msg}`) {
-                sysFeedbackSpan.innerHTML = `⚙️ awaiting scribe`;
+            if (sysFeedback.innerHTML === `✦ ${msg}` || sysFeedback.innerHTML === `⚠️ ${msg}`) {
+                sysFeedback.innerHTML = `⚙️ ready`;
             }
-        }, 2800);
+        }, 2500);
     }
 
-    function formatEntryBody(rawText) {
-        if (!rawText) return '… a passage lost to time …';
-        const trimmed = rawText.trim();
-        if (trimmed.startsWith('Within the Abbey,')) return trimmed;
-        return `Within the Abbey, ${trimmed.charAt(0).toLowerCase() + trimmed.slice(1)}`;
+    function formatText(text) {
+        if (!text) return '… empty passage …';
+        if (text.startsWith('Within the Abbey,')) return text;
+        return `Within the Abbey, ${text.charAt(0).toLowerCase() + text.slice(1)}`;
     }
 
     function addEntryToUI(entry, isWritten = false) {
         if (!entry) return;
         const card = document.createElement('div');
         card.className = 'entry-card' + (isWritten ? ' written' : '');
-        const date = entry.created_at ? new Date(entry.created_at).toLocaleString() : 'this hour';
-        const metaIcon = isWritten ? '✍️' : '◈';
-        const metaLabel = isWritten ? 'inscribed by a scribe' : 'archive recollection';
+        const date = entry.created_at ? new Date(entry.created_at).toLocaleString() : 'this moment';
+        const icon = isWritten ? '✍️' : '◈';
+        const label = isWritten ? 'inscribed' : 'recollection';
         card.innerHTML = `
-            <div class="entry-meta">${metaIcon} ${metaLabel} · ${date}</div>
-            <div class="entry-body">${formatEntryBody(entry.body || entry.text)}</div>
+            <div class="entry-meta">${icon} ${label} · ${date}</div>
+            <div class="entry-body">${formatText(entry.body || entry.text)}</div>
         `;
         outputDiv.appendChild(card);
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     async function fetchRandomEntry() {
-        const randomTable = TABLES[Math.floor(Math.random() * TABLES.length)];
-        const url = `${SUPABASE_URL}/rest/v1/${randomTable}?select=id,text,body,created_at&limit=15`;
+        // Simple fetch without complex ordering
+        const url = `${SUPABASE_URL}/rest/v1/${TABLE}?select=id,body,created_at&limit=20`;
         try {
             const res = await fetch(url, {
-                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                }
             });
-            if (!res.ok) throw new Error();
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(`HTTP ${res.status}: ${text}`);
+            }
             const data = await res.json();
             if (!data || data.length === 0) return null;
-            const entry = data[Math.floor(Math.random() * data.length)];
-            return { body: entry.body || entry.text, created_at: entry.created_at };
-        } catch {
+            const randomIndex = Math.floor(Math.random() * data.length);
+            return data[randomIndex];
+        } catch (err) {
+            console.error('Fetch error:', err);
+            setFeedback(`could not reach archive: ${err.message}`, true);
             return null;
-        }
-    }
-
-    async function onRelic() {
-        setFeedback('turning pages of the grimoir...');
-        const entry = await fetchRandomEntry();
-        if (entry) {
-            addEntryToUI(entry, false);
-            setFeedback('a passage rises from the archive');
-        } else {
-            addEntryToUI({ body: 'The Abbey whispers, but no passages yet remain. Write the first.', created_at: null }, false);
         }
     }
 
     async function writeEntry(text) {
         if (!text || !text.trim()) {
-            setFeedback('the scribe cannot write emptiness', true);
+            setFeedback('cannot write an empty passage', true);
             return;
         }
-        const targetTable = 'demeter_entries';
+
         const newEntry = {
             body: text.trim(),
             created_at: new Date().toISOString(),
-            source: 'scribe'
+            source: 'grimoir'
         };
-        const url = `${SUPABASE_URL}/rest/v1/${targetTable}`;
+
+        const url = `${SUPABASE_URL}/rest/v1/${TABLE}`;
         try {
             const res = await fetch(url, {
                 method: 'POST',
@@ -364,50 +337,65 @@
                 },
                 body: JSON.stringify(newEntry)
             });
-            if (!res.ok) throw new Error();
-            setFeedback('✧ passage inscribed into the grimoir');
+            if (!res.ok) {
+                const errText = await res.text();
+                throw new Error(`HTTP ${res.status}: ${errText}`);
+            }
+            setFeedback('✧ passage inscribed');
             addEntryToUI({ body: text.trim(), created_at: new Date().toISOString() }, true);
         } catch (err) {
-            console.error(err);
-            setFeedback('the Abbey could not record the passage', true);
+            console.error('Write error:', err);
+            setFeedback(`could not inscribe: ${err.message}`, true);
+        }
+    }
+
+    async function onRelic() {
+        setFeedback('searching the archive...');
+        const entry = await fetchRandomEntry();
+        if (entry) {
+            addEntryToUI(entry, false);
+            setFeedback('a passage rises from the grimoir');
+        } else {
+            addEntryToUI({ body: 'The archive is silent. Be the first to write.', created_at: null }, false);
         }
     }
 
     function showHelp() { helpOverlay.classList.add('visible'); }
     function hideHelp() { helpOverlay.classList.remove('visible'); }
 
-    function dispatchCommand(cmd) {
+    async function dispatchCommand(cmd) {
         const trimmed = cmd.trim().toLowerCase();
         if (trimmed === 'help') { showHelp(); return; }
-        if (trimmed === 'relic') { onRelic(); return; }
+        if (trimmed === 'relic') { await onRelic(); return; }
         if (trimmed.startsWith('write ')) {
             const writeText = cmd.slice(6).trim();
-            if (writeText) writeEntry(writeText);
-            else setFeedback('write what? e.g., write the river remembers', true);
+            if (writeText) await writeEntry(writeText);
+            else setFeedback('write what?', true);
             return;
         }
-        setFeedback(`the Abbey does not know "${cmd}" · type 'help'`, true);
+        setFeedback(`unknown command: "${cmd}" · try 'help'`, true);
     }
 
+    // Initialize
     window.addEventListener('DOMContentLoaded', () => {
         const submitBtn = document.getElementById('submitBtn');
-        submitBtn.addEventListener('click', () => {
+        submitBtn.addEventListener('click', async () => {
             const val = commandInput.value;
-            if (val) dispatchCommand(val);
+            if (val) await dispatchCommand(val);
             commandInput.value = '';
             commandInput.focus();
         });
-        commandInput.addEventListener('keypress', (e) => {
+        commandInput.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const val = commandInput.value;
-                if (val) dispatchCommand(val);
+                if (val) await dispatchCommand(val);
                 commandInput.value = '';
             }
         });
         document.getElementById('closeHelpBtn').addEventListener('click', hideHelp);
         helpOverlay.addEventListener('click', (e) => { if (e.target === helpOverlay) hideHelp(); });
-        setFeedback('the grimoir awaits');
+        setFeedback('grimoir ready · write or relic');
         commandInput.focus();
     });
 </script>
