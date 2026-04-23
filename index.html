@@ -75,7 +75,6 @@
             border: 1px solid rgba(210, 190, 150, 0.2);
             backdrop-filter: blur(2px);
             border-left: 4px solid #6b8e5e;
-            transition: all 0.2s ease;
         }
 
         .entry-card.written {
@@ -88,7 +87,6 @@
             font-family: monospace;
             color: #8696aa;
             margin-bottom: 0.5rem;
-            letter-spacing: 0.5px;
         }
 
         .entry-body {
@@ -96,10 +94,6 @@
             line-height: 1.55;
             white-space: pre-wrap;
             color: #e0e2e9;
-        }
-
-        .entry-card.written .entry-body {
-            color: #f0e6d2;
         }
 
         .command-section {
@@ -124,7 +118,7 @@
             border: 1px solid #2a2f3a;
             color: #f0f2f5;
             padding: 0.6rem 1rem;
-            font-family: 'SF Mono', monospace;
+            font-family: monospace;
             font-size: 0.85rem;
             border-radius: 60px;
             outline: none;
@@ -278,7 +272,6 @@
 </div>
 
 <script>
-    // Replace with your Supabase credentials
     const SUPABASE_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
 
@@ -315,7 +308,7 @@
         const metaLabel = isWritten ? 'inscribed by a scribe' : 'archive recollection';
         card.innerHTML = `
             <div class="entry-meta">${metaIcon} ${metaLabel} · ${date}</div>
-            <div class="entry-body">${formatEntryBody(entry.text || entry.body)}</div>
+            <div class="entry-body">${formatEntryBody(entry.body || entry.text)}</div>
         `;
         outputDiv.appendChild(card);
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -332,7 +325,7 @@
             const data = await res.json();
             if (!data || data.length === 0) return null;
             const entry = data[Math.floor(Math.random() * data.length)];
-            return { text: entry.text || entry.body, created_at: entry.created_at };
+            return { body: entry.body || entry.text, created_at: entry.created_at };
         } catch {
             return null;
         }
@@ -345,7 +338,7 @@
             addEntryToUI(entry, false);
             setFeedback('a passage rises from the archive');
         } else {
-            addEntryToUI({ text: 'The Abbey whispers, but no passages yet remain. Write the first.', created_at: null }, false);
+            addEntryToUI({ body: 'The Abbey whispers, but no passages yet remain. Write the first.', created_at: null }, false);
         }
     }
 
@@ -354,10 +347,9 @@
             setFeedback('the scribe cannot write emptiness', true);
             return;
         }
-        // Write to Demeter (the growing archive)
         const targetTable = 'demeter_entries';
         const newEntry = {
-            text: text.trim(),
+            body: text.trim(),
             created_at: new Date().toISOString(),
             source: 'scribe'
         };
@@ -374,8 +366,9 @@
             });
             if (!res.ok) throw new Error();
             setFeedback('✧ passage inscribed into the grimoir');
-            addEntryToUI({ text: text.trim(), created_at: new Date().toISOString() }, true);
-        } catch {
+            addEntryToUI({ body: text.trim(), created_at: new Date().toISOString() }, true);
+        } catch (err) {
+            console.error(err);
             setFeedback('the Abbey could not record the passage', true);
         }
     }
