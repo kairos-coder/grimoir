@@ -29,6 +29,7 @@
             flex-direction: column;
             height: 85vh;
             min-height: 560px;
+            position: relative;
         }
 
         .grimoir-header {
@@ -58,6 +59,18 @@
             flex: 1;
             overflow-y: auto;
             padding: 1.6rem;
+            scroll-behavior: smooth;
+        }
+
+        .output-area::-webkit-scrollbar {
+            width: 4px;
+        }
+        .output-area::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .output-area::-webkit-scrollbar-thumb {
+            background: rgba(90, 110, 130, 0.3);
+            border-radius: 4px;
         }
 
         .entry-card {
@@ -66,6 +79,25 @@
             padding: 1rem 1.2rem;
             margin-bottom: 1rem;
             border-left: 3px solid #6b8e5e;
+            animation: fadeSlideIn 0.3s ease forwards;
+            opacity: 0;
+            transform: translateY(6px);
+        }
+
+        .entry-card.harvest-card {
+            border-left-color: #8e7a5e;
+        }
+
+        .entry-card.find-card {
+            border-left-color: #5e7a8e;
+        }
+
+        .entry-card.system-card {
+            border-left-color: #5a5e6a;
+        }
+
+        @keyframes fadeSlideIn {
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .entry-meta {
@@ -81,6 +113,27 @@
             color: #e0e2e9;
         }
 
+        /* Highlighted match text */
+        mark {
+            background: rgba(180, 150, 70, 0.28);
+            color: #e2c97a;
+            border-radius: 3px;
+            padding: 0 2px;
+            font-style: inherit;
+        }
+
+        /* Section header card for grouped results */
+        .section-banner {
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #6a7a8a;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 0.4rem 0.8rem;
+            border-bottom: 1px solid rgba(90, 110, 130, 0.2);
+            margin-bottom: 0.6rem;
+        }
+
         .command-section {
             background: #05070c;
             border-top: 1px solid rgba(120, 130, 150, 0.25);
@@ -88,6 +141,7 @@
             display: flex;
             gap: 0.6rem;
             align-items: center;
+            border-radius: 0 0 2rem 2rem;
         }
 
         .prompt {
@@ -106,6 +160,11 @@
             font-size: 0.85rem;
             border-radius: 60px;
             outline: none;
+            transition: border-color 0.2s;
+        }
+
+        #commandInput:focus {
+            border-color: rgba(110, 140, 100, 0.5);
         }
 
         button {
@@ -115,6 +174,8 @@
             padding: 0.5rem 1.2rem;
             border-radius: 40px;
             cursor: pointer;
+            transition: background 0.2s;
+            font-family: 'Palatino', 'Georgia', serif;
         }
 
         button:hover {
@@ -129,10 +190,22 @@
             padding: 0.25rem 0.8rem;
             border-radius: 30px;
             display: inline-block;
-            margin: 0.2rem 1.2rem 0.5rem;
-            text-align: right;
+            margin: 0.3rem 1.2rem 0.6rem;
+            float: right;
+            transition: color 0.3s;
         }
 
+        .sys-feedback.error {
+            color: #c08080;
+        }
+
+        .clearfix::after {
+            content: '';
+            display: table;
+            clear: both;
+        }
+
+        /* Help overlay */
         .help-overlay {
             position: absolute;
             top: 0;
@@ -147,7 +220,8 @@
             justify-content: center;
             visibility: hidden;
             opacity: 0;
-            transition: 0.2s;
+            transition: opacity 0.2s, visibility 0.2s;
+            border-radius: 2rem;
         }
 
         .help-overlay.visible {
@@ -156,46 +230,76 @@
         }
 
         .help-panel {
-            max-width: 450px;
-            width: 85%;
+            max-width: 480px;
+            width: 88%;
             background: #0f131e;
-            border: 1px solid #5f6a7a;
+            border: 1px solid #3a4555;
             border-radius: 1.5rem;
-            padding: 1.5rem;
+            padding: 1.8rem 2rem;
             position: relative;
         }
 
         .help-panel h3 {
-            font-size: 1.1rem;
-            border-bottom: 1px solid #5f6a7a;
-            display: inline-block;
-            margin-bottom: 1rem;
-            color: #cfd9e6;
+            font-size: 0.75rem;
+            font-family: monospace;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #8a9ab0;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid #2a3040;
+        }
+
+        .help-panel ul {
+            list-style: none;
         }
 
         .help-panel li {
-            margin-bottom: 0.7rem;
-            font-size: 0.85rem;
+            margin-bottom: 0.9rem;
+            font-size: 0.88rem;
             color: #cddbe9;
-            border-left: 2px solid #5f6a7a;
-            padding-left: 0.8rem;
-            list-style: none;
+            padding-left: 1rem;
+            border-left: 2px solid #3a4a5a;
+            line-height: 1.5;
         }
 
         .help-panel .cmd {
             font-family: monospace;
             color: #e2bc7c;
+            display: block;
+            margin-bottom: 0.15rem;
+        }
+
+        .cmd-desc {
+            color: #8a9ab0;
+            font-size: 0.8rem;
         }
 
         .close-help {
             position: absolute;
-            top: 0.8rem;
-            right: 1rem;
-            font-size: 1.3rem;
+            top: 1rem;
+            right: 1.2rem;
+            font-size: 1.2rem;
             cursor: pointer;
-            color: #a0abbc;
+            color: #6a7a8a;
             background: none;
             border: none;
+            padding: 0.2rem 0.5rem;
+        }
+
+        .close-help:hover {
+            color: #a0b0c0;
+            background: none;
+        }
+
+        .loading-pulse {
+            display: inline-block;
+            animation: pulse 1.2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
         }
     </style>
 </head>
@@ -208,39 +312,86 @@
     </div>
 
     <div class="output-area" id="outputArea">
-        <div class="entry-card">
+        <div class="entry-card" style="animation: none; opacity: 1; transform: none;">
             <div class="entry-meta">◈ initium ◈</div>
-            <div class="entry-body">Type <span style="color:#c3b87c;">relic</span> to read. <span style="color:#9ab3c9;">write [text]</span> to inscribe.</div>
+            <div class="entry-body">
+                Type <span style="color:#c3b87c;">relic</span> to read a passage.
+                <span style="color:#9ab3c9;">write [text]</span> to inscribe.
+                <span style="color:#9ab3c9;">find [text]</span> to search.
+                <span style="color:#9ab3c9;">harvest</span> for recent entries.
+                <span style="color:#8a9ab0;">help</span> for all commands.
+            </div>
         </div>
+    </div>
+
+    <div style="height: 0;" class="clearfix">
+        <span class="sys-feedback" id="sysFeedback">⚙️ ready</span>
     </div>
 
     <div class="command-section">
         <span class="prompt">⟡</span>
-        <input type="text" id="commandInput" placeholder="relic · write the candle remembers" autofocus>
+        <input type="text" id="commandInput" placeholder="relic · write · find · harvest · help" autofocus>
         <button id="submitBtn">invoke</button>
     </div>
-    <div style="text-align: right;">
-        <span class="sys-feedback" id="sysFeedback">⚙️ ready</span>
+
+    <!-- Help Overlay -->
+    <div class="help-overlay" id="helpOverlay">
+        <div class="help-panel">
+            <button class="close-help" id="closeHelp">✕</button>
+            <h3>⟡ Grimoir Commands</h3>
+            <ul>
+                <li>
+                    <span class="cmd">relic</span>
+                    <span class="cmd-desc">Summon a random passage from the archive.</span>
+                </li>
+                <li>
+                    <span class="cmd">write [text]</span>
+                    <span class="cmd-desc">Inscribe new text into the grimoir.</span>
+                </li>
+                <li>
+                    <span class="cmd">find [text]</span>
+                    <span class="cmd-desc">Search the archive for passages containing your phrase. Matches are highlighted.</span>
+                </li>
+                <li>
+                    <span class="cmd">harvest</span>
+                    <span class="cmd-desc">Surface the 5 most recently inscribed passages, newest first.</span>
+                </li>
+                <li>
+                    <span class="cmd">help</span>
+                    <span class="cmd-desc">Show this command reference.</span>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>
 
 <script>
     const SUPABASE_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
-
     const TABLE = 'zeus_entries';
 
     const outputDiv = document.getElementById('outputArea');
     const commandInput = document.getElementById('commandInput');
     const sysFeedback = document.getElementById('sysFeedback');
+    const helpOverlay = document.getElementById('helpOverlay');
+    const closeHelp = document.getElementById('closeHelp');
+
+    let feedbackTimer = null;
 
     function setFeedback(msg, isError = false) {
+        if (feedbackTimer) clearTimeout(feedbackTimer);
+        sysFeedback.className = 'sys-feedback' + (isError ? ' error' : '');
         sysFeedback.innerHTML = isError ? `⚠️ ${msg}` : `✦ ${msg}`;
-        setTimeout(() => {
-            if (sysFeedback.innerHTML === `✦ ${msg}` || sysFeedback.innerHTML === `⚠️ ${msg}`) {
-                sysFeedback.innerHTML = `⚙️ ready`;
-            }
-        }, 2500);
+        feedbackTimer = setTimeout(() => {
+            sysFeedback.className = 'sys-feedback';
+            sysFeedback.innerHTML = `⚙️ ready`;
+        }, 3000);
+    }
+
+    function setLoading(msg) {
+        if (feedbackTimer) clearTimeout(feedbackTimer);
+        sysFeedback.className = 'sys-feedback';
+        sysFeedback.innerHTML = `<span class="loading-pulse">◌</span> ${msg}`;
     }
 
     function formatText(text) {
@@ -249,122 +400,270 @@
         return `Within the Abbey, ${text.charAt(0).toLowerCase() + text.slice(1)}`;
     }
 
-    function addEntryToUI(entry, isWritten = false) {
+    // Highlight occurrences of `term` within `text` (plain text, returns HTML-safe string)
+    function highlightMatch(text, term) {
+        if (!term) return escapeHtml(text);
+        const escaped = escapeHtml(text);
+        const escapedTerm = escapeHtml(term).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(`(${escapedTerm})`, 'gi');
+        return escaped.replace(regex, '<mark>$1</mark>');
+    }
+
+    function escapeHtml(str) {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function addSectionBanner(text) {
+        const banner = document.createElement('div');
+        banner.className = 'section-banner';
+        banner.textContent = text;
+        outputDiv.appendChild(banner);
+    }
+
+    function addEntryToUI(entry, options = {}) {
         if (!entry) return;
+        const {
+            isWritten = false,
+            isHarvest = false,
+            isFind = false,
+            highlight = null,
+            index = 0
+        } = options;
+
         const card = document.createElement('div');
         card.className = 'entry-card';
-        const date = entry.created_at ? new Date(entry.created_at).toLocaleString() : 'this moment';
-        const icon = isWritten ? '✍️' : '◈';
-        const label = isWritten ? 'inscribed' : 'recollection';
+        if (isHarvest) card.classList.add('harvest-card');
+        if (isFind) card.classList.add('find-card');
+        if (options.isSystem) card.classList.add('system-card');
+
+        // Stagger animation for grouped results
+        if (index > 0) {
+            card.style.animationDelay = `${index * 60}ms`;
+        }
+
+        const date = entry.created_at
+            ? new Date(entry.created_at).toLocaleString()
+            : 'this moment';
+
+        let icon, label;
+        if (isWritten)      { icon = '✍️'; label = 'inscribed'; }
+        else if (isHarvest) { icon = '⚱️'; label = 'harvest'; }
+        else if (isFind)    { icon = '🔍'; label = 'found'; }
+        else                { icon = '◈';  label = 'recollection'; }
+
+        const rawBody = entry.body || '';
+        const displayBody = highlight
+            ? highlightMatch(formatText(rawBody), highlight)
+            : escapeHtml(formatText(rawBody));
+
         card.innerHTML = `
             <div class="entry-meta">${icon} ${label} · ${date}</div>
-            <div class="entry-body">${formatText(entry.body)}</div>
+            <div class="entry-body">${displayBody}</div>
         `;
         outputDiv.appendChild(card);
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
-    async function fetchRandomEntry() {
-        const url = `${SUPABASE_URL}/rest/v1/${TABLE}?select=id,body,created_at&limit=30`;
+    function addSystemCard(message) {
+        const card = document.createElement('div');
+        card.className = 'entry-card system-card';
+        card.innerHTML = `
+            <div class="entry-meta">◇ system</div>
+            <div class="entry-body" style="color:#8a9ab0; font-style: italic;">${escapeHtml(message)}</div>
+        `;
+        outputDiv.appendChild(card);
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // ── API helpers ──────────────────────────────────────────────
+
+    async function apiFetch(path, opts = {}) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                ...opts.headers
+            },
+            ...opts
+        });
+        if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(`HTTP ${res.status}: ${errText}`);
+        }
+        return res;
+    }
+
+    // ── Commands ─────────────────────────────────────────────────
+
+    async function onRelic() {
+        setLoading('searching the archive…');
         try {
-            const res = await fetch(url, {
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const res = await apiFetch(`${TABLE}?select=id,body,created_at&limit=50`);
             const data = await res.json();
-            if (!data || data.length === 0) return null;
-            const randomIndex = Math.floor(Math.random() * data.length);
-            return data[randomIndex];
+            if (!data || data.length === 0) {
+                addSystemCard('The archive is silent. Be the first to write.');
+                setFeedback('archive is empty');
+                return;
+            }
+            const entry = data[Math.floor(Math.random() * data.length)];
+            addEntryToUI(entry);
+            setFeedback('a passage rises from the grimoir');
         } catch (err) {
-            console.error('Fetch error:', err);
-            setFeedback(`could not reach archive`, true);
-            return null;
+            console.error(err);
+            setFeedback('could not reach the archive', true);
         }
     }
 
-    async function writeEntry(text) {
+    async function onWrite(text) {
         if (!text || !text.trim()) {
             setFeedback('cannot write an empty passage', true);
             return;
         }
-
-        // Generate a simple label from the first few words
-        const firstWords = text.trim().split(/\s+/).slice(0, 3).join('_');
-        const label = `grimoir_${firstWords}_${Date.now()}`;
-        const wordCount = text.trim().split(/\s+/).length;
-
+        const trimmed = text.trim();
+        setLoading('inscribing…');
+        const firstWords = trimmed.split(/\s+/).slice(0, 3).join('_');
         const newEntry = {
-            label: label,
-            body: text.trim(),
-            word_count: wordCount,
+            label: `grimoir_${firstWords}_${Date.now()}`,
+            body: trimmed,
+            word_count: trimmed.split(/\s+/).length,
             created_at: new Date().toISOString()
         };
-
-        const url = `${SUPABASE_URL}/rest/v1/${TABLE}`;
         try {
-            const res = await fetch(url, {
+            await apiFetch(TABLE, {
                 method: 'POST',
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json'
-                },
                 body: JSON.stringify(newEntry)
             });
-            if (!res.ok) {
-                const errText = await res.text();
-                throw new Error(`HTTP ${res.status}: ${errText}`);
-            }
+            addEntryToUI({ body: trimmed, created_at: newEntry.created_at }, { isWritten: true });
             setFeedback('✧ passage inscribed into the grimoir');
-            addEntryToUI({ body: text.trim(), created_at: new Date().toISOString() }, true);
         } catch (err) {
-            console.error('Write error:', err);
+            console.error(err);
             setFeedback(`could not inscribe: ${err.message.slice(0, 80)}`, true);
         }
     }
 
-    async function onRelic() {
-        setFeedback('searching the archive...');
-        const entry = await fetchRandomEntry();
-        if (entry) {
-            addEntryToUI(entry, false);
-            setFeedback('a passage rises from the grimoir');
-        } else {
-            addEntryToUI({ body: 'The archive is silent. Be the first to write.', created_at: null }, false);
-        }
-    }
-
-    async function dispatchCommand(cmd) {
-        const trimmed = cmd.trim().toLowerCase();
-        if (trimmed === 'relic') { await onRelic(); return; }
-        if (trimmed.startsWith('write ')) {
-            const writeText = cmd.slice(6).trim();
-            if (writeText) await writeEntry(writeText);
-            else setFeedback('write what?', true);
+    async function onFind(term) {
+        if (!term || !term.trim()) {
+            setFeedback('find what? · try: find candle', true);
             return;
         }
-        setFeedback(`unknown command: "${cmd}" · try 'relic' or 'write [text]'`, true);
+        const trimmed = term.trim();
+        setLoading(`searching for "${trimmed}"…`);
+        try {
+            // ilike performs case-insensitive pattern match in PostgREST
+            const encoded = encodeURIComponent(`%${trimmed}%`);
+            const res = await apiFetch(
+                `${TABLE}?select=id,body,created_at&body=ilike.${encoded}&order=created_at.desc&limit=20`
+            );
+            const data = await res.json();
+            if (!data || data.length === 0) {
+                addSystemCard(`No passages found containing "${trimmed}".`);
+                setFeedback(`no matches for "${trimmed}"`);
+                return;
+            }
+            addSectionBanner(`⟡ find: "${trimmed}" — ${data.length} passage${data.length !== 1 ? 's' : ''} found`);
+            data.forEach((entry, i) => {
+                addEntryToUI(entry, { isFind: true, highlight: trimmed, index: i });
+            });
+            setFeedback(`${data.length} passage${data.length !== 1 ? 's' : ''} surfaced`);
+        } catch (err) {
+            console.error(err);
+            setFeedback('search failed · archive unreachable', true);
+        }
     }
 
+    async function onHarvest() {
+        setLoading('gathering recent passages…');
+        try {
+            const res = await apiFetch(
+                `${TABLE}?select=id,body,created_at&order=created_at.desc&limit=5`
+            );
+            const data = await res.json();
+            if (!data || data.length === 0) {
+                addSystemCard('The archive has no entries yet. Write something.');
+                setFeedback('nothing to harvest');
+                return;
+            }
+            addSectionBanner(`⚱️ harvest — ${data.length} most recent passage${data.length !== 1 ? 's' : ''}`);
+            data.forEach((entry, i) => {
+                addEntryToUI(entry, { isHarvest: true, index: i });
+            });
+            setFeedback(`${data.length} passage${data.length !== 1 ? 's' : ''} harvested`);
+        } catch (err) {
+            console.error(err);
+            setFeedback('harvest failed · archive unreachable', true);
+        }
+    }
+
+    function onHelp() {
+        helpOverlay.classList.add('visible');
+    }
+
+    // ── Dispatcher ───────────────────────────────────────────────
+
+    async function dispatchCommand(raw) {
+        const cmd = raw.trim();
+        const lower = cmd.toLowerCase();
+
+        if (lower === 'relic') {
+            await onRelic();
+        } else if (lower.startsWith('write ')) {
+            await onWrite(cmd.slice(6));
+        } else if (lower === 'find' || lower === 'find ') {
+            setFeedback('find what? · try: find candle', true);
+        } else if (lower.startsWith('find ')) {
+            await onFind(cmd.slice(5));
+        } else if (lower === 'harvest') {
+            await onHarvest();
+        } else if (lower === 'help') {
+            onHelp();
+        } else {
+            setFeedback(`unknown command: "${cmd}" · type help for reference`, true);
+        }
+    }
+
+    // ── Init ─────────────────────────────────────────────────────
+
     window.addEventListener('DOMContentLoaded', () => {
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.addEventListener('click', async () => {
-            const val = commandInput.value;
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            const val = commandInput.value.trim();
             if (val) await dispatchCommand(val);
             commandInput.value = '';
             commandInput.focus();
         });
+
         commandInput.addEventListener('keypress', async (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                const val = commandInput.value;
+                const val = commandInput.value.trim();
                 if (val) await dispatchCommand(val);
                 commandInput.value = '';
             }
         });
+
+        closeHelp.addEventListener('click', () => {
+            helpOverlay.classList.remove('visible');
+            commandInput.focus();
+        });
+
+        helpOverlay.addEventListener('click', (e) => {
+            if (e.target === helpOverlay) {
+                helpOverlay.classList.remove('visible');
+                commandInput.focus();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && helpOverlay.classList.contains('visible')) {
+                helpOverlay.classList.remove('visible');
+                commandInput.focus();
+            }
+        });
+
         setFeedback('grimoir ready · write or relic');
         commandInput.focus();
     });
