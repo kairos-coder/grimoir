@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Ealdforn Grimoir · Living Archive</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background: #0a0c12;
@@ -18,11 +14,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Palatino', 'Georgia', 'Times New Roman', serif;
+            font-family: 'Palatino', 'Georgia', serif;
             padding: 1rem;
         }
 
-        /* Main container — ritual reading interface */
         .grimoir {
             max-width: 860px;
             width: 100%;
@@ -30,8 +25,6 @@
             backdrop-filter: blur(2px);
             border: 1px solid rgba(90, 110, 130, 0.25);
             border-radius: 2rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.02);
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             height: 85vh;
@@ -39,9 +32,8 @@
             position: relative;
         }
 
-        /* Header — lens indicator */
         .grimoir-header {
-            padding: 1.2rem 1.6rem 0.8rem 1.6rem;
+            padding: 1.2rem 1.6rem 0.8rem;
             border-bottom: 1px solid rgba(210, 190, 150, 0.2);
             display: flex;
             justify-content: space-between;
@@ -54,8 +46,6 @@
             font-size: 1.2rem;
             letter-spacing: 2px;
             font-weight: 400;
-            color: #cfd5e0;
-            text-transform: uppercase;
             background: linear-gradient(135deg, #ebe9e0, #a7b1b8);
             background-clip: text;
             -webkit-background-clip: text;
@@ -72,7 +62,6 @@
             color: #c0b99a;
         }
 
-        /* Scrollable output — the living archive */
         .output-area {
             flex: 1;
             overflow-y: auto;
@@ -80,28 +69,23 @@
             font-size: 1rem;
             line-height: 1.65;
             color: #dbdee6;
-            scroll-behavior: smooth;
         }
 
-        /* entry cards */
         .relic-card {
             background: rgba(15, 18, 26, 0.6);
             border-radius: 1.2rem;
             padding: 1.2rem 1.4rem;
             margin-bottom: 1.5rem;
             border: 1px solid rgba(210, 190, 150, 0.2);
-            transition: all 0.2s ease;
             backdrop-filter: blur(4px);
         }
 
         .relic-card.abbey {
             border-left: 4px solid #6b8e5e;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .relic-card.glimhaven {
             border-left: 4px solid #2a5e8a;
-            text-shadow: 0 0 2px rgba(90, 130, 180, 0.3);
         }
 
         .relic-meta {
@@ -109,27 +93,17 @@
             font-family: monospace;
             color: #8696aa;
             margin-bottom: 0.5rem;
-            letter-spacing: 0.3px;
         }
 
         .relic-body {
-            font-size: 1.02rem;
+            font-size: 1rem;
             line-height: 1.55;
             white-space: pre-wrap;
-            word-break: break-word;
         }
 
-        .abbey .relic-body {
-            font-style: normal;
-            color: #e0e2e9;
-        }
+        .abbey .relic-body { color: #e0e2e9; }
+        .glimhaven .relic-body { font-style: italic; color: #cbd5e9; }
 
-        .glimhaven .relic-body {
-            font-style: italic;
-            color: #cbd5e9;
-        }
-
-        /* command line — minimal but clear */
         .command-section {
             background: #05070c;
             border-top: 1px solid rgba(120, 130, 150, 0.25);
@@ -137,7 +111,6 @@
             display: flex;
             gap: 0.6rem;
             align-items: center;
-            flex-wrap: wrap;
         }
 
         .prompt {
@@ -153,16 +126,14 @@
             border: 1px solid #2a2f3a;
             color: #f0f2f5;
             padding: 0.6rem 1rem;
-            font-family: 'SF Mono', monospace;
+            font-family: monospace;
             font-size: 0.85rem;
             border-radius: 60px;
             outline: none;
-            transition: 0.2s;
         }
 
         #commandInput:focus {
             border-color: #7a6a4a;
-            background: #11161f;
         }
 
         button {
@@ -174,7 +145,6 @@
             font-family: inherit;
             font-size: 0.75rem;
             cursor: pointer;
-            transition: 0.2s;
         }
 
         button:hover {
@@ -190,16 +160,17 @@
             padding: 0.25rem 0.8rem;
             border-radius: 30px;
             display: inline-block;
+            margin: 0.2rem 1.2rem 0.8rem;
+            text-align: right;
         }
 
-        /* HELP OVERLAY — codex fragment style */
         .help-overlay {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(5, 7, 12, 0.92);
+            background: rgba(5, 7, 12, 0.95);
             backdrop-filter: blur(6px);
             z-index: 100;
             display: flex;
@@ -207,7 +178,7 @@
             justify-content: center;
             visibility: hidden;
             opacity: 0;
-            transition: visibility 0.2s, opacity 0.2s;
+            transition: 0.2s;
         }
 
         .help-overlay.visible {
@@ -222,23 +193,15 @@
             border: 1px solid #5f6a7a;
             border-radius: 1.8rem;
             padding: 1.8rem;
-            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.6);
-            font-family: 'Palatino', 'Georgia', serif;
             position: relative;
         }
 
         .help-panel h3 {
             font-size: 1.25rem;
-            letter-spacing: 2px;
             border-bottom: 1px solid #5f6a7a;
             display: inline-block;
             margin-bottom: 1.2rem;
             color: #cfd9e6;
-        }
-
-        .help-panel ul {
-            list-style: none;
-            margin-top: 0.8rem;
         }
 
         .help-panel li {
@@ -247,6 +210,7 @@
             color: #cddbe9;
             border-left: 2px solid #5f6a7a;
             padding-left: 0.8rem;
+            list-style: none;
         }
 
         .help-panel .cmd {
@@ -264,33 +228,15 @@
             color: #a0abbc;
             background: none;
             border: none;
-            padding: 0;
-            font-weight: bold;
         }
 
         .close-help:hover {
             color: #eeddaa;
         }
 
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0a0d14;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #2b3342;
-            border-radius: 6px;
-        }
-
-        @media (max-width: 580px) {
-            .grimoir {
-                height: 92vh;
-            }
-            .relic-body {
-                font-size: 0.9rem;
-            }
-        }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #0a0d14; }
+        ::-webkit-scrollbar-thumb { background: #2b3342; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -315,19 +261,18 @@
         <input type="text" id="commandInput" placeholder="relic · write the river remembers · mode abbey · help" autofocus>
         <button id="submitBtn">invoke</button>
     </div>
-    <div style="padding: 0.2rem 1.2rem 0.8rem 1.2rem; text-align: right;">
+    <div style="text-align: right;">
         <span class="sys-feedback" id="sysFeedback">⚙️ waiting</span>
     </div>
 </div>
 
-<!-- HELP OVERLAY (codex fragment) -->
 <div id="helpOverlay" class="help-overlay">
     <div class="help-panel">
         <button class="close-help" id="closeHelpBtn">✕</button>
         <h3>✧ Grimoir Commands ✧</h3>
         <ul>
             <li><span class="cmd">relic</span> — draw a memory fragment from current lens</li>
-            <li><span class="cmd">write [text]</span> — add a new entry to the current lens <br> <span style="font-size:0.7rem;">(Abbey → Demeter / Glimhaven → Poseidon)</span></li>
+            <li><span class="cmd">write [text]</span> — add a new entry to the current lens</li>
             <li><span class="cmd">mode abbey</span> — switch to Abbey (Demeter + Athena)</li>
             <li><span class="cmd">mode glimhaven</span> — switch to Glimhaven (Poseidon + Zeus)</li>
             <li><span class="cmd">help</span> — show this codex</li>
@@ -337,58 +282,23 @@
 </div>
 
 <script>
-    // ============================================================
-    // EALDFORN GRIMOIR — LENS INTERFACE / WRITE + HELP SYSTEM
-    // Immersive dual-lens archive. Read, write, invoke, understand.
-    // ============================================================
-
-    // ------------------------------------------------------------------
-    // 1. SUPABASE CREDENTIALS (REPLACE WITH YOUR PROJECT KEYS)
-    // ------------------------------------------------------------------
     const SUPABASE_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
 
-    // ------------------------------------------------------------------
-    // 2. STATE & DOM ELEMENTS
-    // ------------------------------------------------------------------
-    let currentMode = 'abbey';          // 'abbey' or 'glimhaven'
+    let currentMode = 'abbey';
     const outputDiv = document.getElementById('outputArea');
     const commandInput = document.getElementById('commandInput');
     const lensBadge = document.getElementById('lensBadge');
     const sysFeedbackSpan = document.getElementById('sysFeedback');
     const helpOverlay = document.getElementById('helpOverlay');
 
-    // Helper: system feedback (non-intrusive)
     function setFeedback(msg, isError = false) {
         sysFeedbackSpan.innerHTML = isError ? `⚠️ ${msg}` : `✦ ${msg}`;
         setTimeout(() => {
             if (sysFeedbackSpan.innerHTML === `✦ ${msg}` || sysFeedbackSpan.innerHTML === `⚠️ ${msg}`) {
                 sysFeedbackSpan.innerHTML = `⚙️ ready`;
             }
-        }, 2800);
-    }
-
-    // ------------------------------------------------------------------
-    // 3. RENDER LOGIC: adds a "relic" card to output (existing style)
-    // ------------------------------------------------------------------
-    function addRelicToUI(entry, mode, tableName, isWritten = false) {
-        if (!entry) return;
-
-        const card = document.createElement('div');
-        card.className = `relic-card ${mode}`;
-        
-        const date = entry.created_at ? new Date(entry.created_at).toLocaleString() : 'just now';
-        const metaIcon = mode === 'abbey' ? '✧' : '◈';
-        let metaLabel = mode === 'abbey' ? 'Abbey archival' : 'Glimhaven shard';
-        if (isWritten) metaLabel = mode === 'abbey' ? 'inscribed into Abbey' : 'inscribed into Glimhaven';
-        
-        card.innerHTML = `
-            <div class="relic-meta">${metaIcon} ${metaLabel} · ${date}</div>
-            <div class="relic-body">${formatEntryBody(entry.text || entry.body, mode)}</div>
-        `;
-        
-        outputDiv.appendChild(card);
-        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 2500);
     }
 
     function formatEntryBody(rawText, mode) {
@@ -403,42 +313,36 @@
         }
     }
 
-    // ------------------------------------------------------------------
-    // 4. FETCH / READ (unchanged from original grimoir)
-    // ------------------------------------------------------------------
+    function addRelicToUI(entry, mode, isWritten = false) {
+        if (!entry) return;
+        const card = document.createElement('div');
+        card.className = `relic-card ${mode}`;
+        const date = entry.created_at ? new Date(entry.created_at).toLocaleString() : 'just now';
+        const metaIcon = mode === 'abbey' ? '✧' : '◈';
+        let metaLabel = mode === 'abbey' ? 'Abbey archival' : 'Glimhaven shard';
+        if (isWritten) metaLabel = mode === 'abbey' ? 'inscribed into Abbey' : 'inscribed into Glimhaven';
+        card.innerHTML = `
+            <div class="relic-meta">${metaIcon} ${metaLabel} · ${date}</div>
+            <div class="relic-body">${formatEntryBody(entry.text || entry.body, mode)}</div>
+        `;
+        outputDiv.appendChild(card);
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
     async function fetchRelic(mode) {
-        let tables = [];
-        if (mode === 'abbey') {
-            tables = ['demeter_entries', 'athena_entries'];
-        } else {
-            tables = ['poseidon_entries', 'zeus_entries'];
-        }
+        const tables = mode === 'abbey' ? ['demeter_entries', 'athena_entries'] : ['poseidon_entries', 'zeus_entries'];
         const randomTable = tables[Math.floor(Math.random() * tables.length)];
         const url = `${SUPABASE_URL}/rest/v1/${randomTable}?select=id,text,body,created_at&limit=15`;
-        
         try {
-            const response = await fetch(url, {
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
+            const res = await fetch(url, {
+                headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
             });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json();
-            if (!data || data.length === 0) {
-                setFeedback(`No entries in ${randomTable} yet`, true);
-                return null;
-            }
-            const randomEntry = data[Math.floor(Math.random() * data.length)];
-            const content = randomEntry.text || randomEntry.body;
-            if (!content) return null;
-            return {
-                text: content,
-                created_at: randomEntry.created_at
-            };
-        } catch (err) {
-            console.error(err);
-            setFeedback(`Cannot reach ${randomTable}`, true);
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            if (!data || data.length === 0) return null;
+            const entry = data[Math.floor(Math.random() * data.length)];
+            return { text: entry.text || entry.body, created_at: entry.created_at };
+        } catch {
             return null;
         }
     }
@@ -447,131 +351,65 @@
         setFeedback(`reading from ${currentMode === 'abbey' ? 'Demeter/Athena' : 'Poseidon/Zeus'}...`);
         const relic = await fetchRelic(currentMode);
         if (relic) {
-            addRelicToUI(relic, currentMode, currentMode, false);
+            addRelicToUI(relic, currentMode, false);
             setFeedback(`relic drawn from ${currentMode === 'abbey' ? 'Abbey archives' : 'Glimhaven depth'}`);
         } else {
-            addRelicToUI({ text: `The ${currentMode} lens is silent. No entries found.`, created_at: null }, currentMode, 'fallback', false);
+            addRelicToUI({ text: `The ${currentMode} lens is silent. No entries found.`, created_at: null }, currentMode, false);
         }
     }
 
-    // ------------------------------------------------------------------
-    // 5. WRITE / ADD ENTRY (NEW)
-    // ------------------------------------------------------------------
     async function writeEntry(text) {
-        if (!text || text.trim().length === 0) {
+        if (!text || !text.trim()) {
             setFeedback("cannot write an empty memory", true);
-            return false;
+            return;
         }
-        let targetTable = '';
-        let iconLabel = '';
-        if (currentMode === 'abbey') {
-            targetTable = 'demeter_entries';    // Abbey writes to Demeter
-            iconLabel = '✧ entry written to Demeter';
-        } else {
-            targetTable = 'poseidon_entries';   // Glimhaven writes to Poseidon
-            iconLabel = '◈ entry written to Poseidon';
-        }
-
-        const newEntry = {
-            text: text.trim(),
-            created_at: new Date().toISOString(),
-            source: "user",
-            mode: currentMode
-        };
-
+        const targetTable = currentMode === 'abbey' ? 'demeter_entries' : 'poseidon_entries';
+        const newEntry = { text: text.trim(), created_at: new Date().toISOString(), source: "user", mode: currentMode };
         const url = `${SUPABASE_URL}/rest/v1/${targetTable}`;
         try {
-            const response = await fetch(url, {
+            const res = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'apikey': SUPABASE_ANON_KEY,
                     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json',
-                    'Prefer': 'return=minimal'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(newEntry)
             });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            setFeedback(iconLabel);
-            // display the newly written entry inside the current lens style
-            addRelicToUI({ text: text.trim(), created_at: new Date().toISOString() }, currentMode, targetTable, true);
-            return true;
-        } catch (err) {
-            console.error(err);
+            if (!res.ok) throw new Error();
+            setFeedback(currentMode === 'abbey' ? '✧ entry written to Demeter' : '◈ entry written to Poseidon');
+            addRelicToUI({ text: text.trim(), created_at: new Date().toISOString() }, currentMode, true);
+        } catch {
             setFeedback(`failed to inscribe into ${targetTable}`, true);
-            return false;
         }
     }
 
-    // ------------------------------------------------------------------
-    // 6. HELP MENU SYSTEM (codex fragment overlay)
-    // ------------------------------------------------------------------
-    function showHelpMenu() {
-        helpOverlay.classList.add('visible');
+    function setMode(mode) {
+        if (mode !== 'abbey' && mode !== 'glimhaven') return;
+        currentMode = mode;
+        lensBadge.innerHTML = currentMode === 'abbey' ? '⚜️ ABBEY LENS · demeter/athena' : '🌊 GLIMHAVEN LENS · poseidon/zeus';
+        setFeedback(`lens switched to ${currentMode === 'abbey' ? 'Abbey' : 'Glimhaven'}`);
     }
 
-    function hideHelpMenu() {
-        helpOverlay.classList.remove('visible');
+    function showHelp() { helpOverlay.classList.add('visible'); }
+    function hideHelp() { helpOverlay.classList.remove('visible'); }
+
+    function dispatchCommand(cmd) {
+        const trimmed = cmd.trim().toLowerCase();
+        if (trimmed === 'help') { showHelp(); return; }
+        if (trimmed === 'mode abbey') { setMode('abbey'); return; }
+        if (trimmed === 'mode glimhaven') { setMode('glimhaven'); return; }
+        if (trimmed === 'relic') { onRelic(); return; }
+        if (trimmed.startsWith('write ')) {
+            const writeText = cmd.slice(6).trim();
+            if (writeText) writeEntry(writeText);
+            else setFeedback("write what? e.g., write the river remembers", true);
+            return;
+        }
+        setFeedback(`unknown command: ${cmd} · type 'help'`, true);
     }
 
-    // ------------------------------------------------------------------
-    // 7. MODE SWITCHING (unchanged but preserved)
-    // ------------------------------------------------------------------
-    function setMode(newMode) {
-        if (newMode !== 'abbey' && newMode !== 'glimhaven') return;
-        currentMode = newMode;
-        const badgeText = currentMode === 'abbey' ? '⚜️ ABBEY LENS · demeter/athena' : '🌊 GLIMHAVEN LENS · poseidon/zeus';
-        lensBadge.innerHTML = badgeText;
-        setFeedback(`lens switched to ${currentMode === 'abbey' ? 'Abbey (grounded narrative)' : 'Glimhaven (mythic fragments)'}`);
-    }
-
-    // ------------------------------------------------------------------
-    // 8. COMMAND PARSER (extended: relic, write, mode, help)
-    // ------------------------------------------------------------------
-    function dispatchCommand(rawCmd) {
-        const trimmed = rawCmd.trim();
-        if (!trimmed) return;
-
-        // HELP command
-        if (trimmed.toLowerCase() === 'help') {
-            showHelpMenu();
-            return;
-        }
-
-        // MODE commands
-        if (trimmed.toLowerCase() === 'mode abbey') {
-            setMode('abbey');
-            return;
-        }
-        if (trimmed.toLowerCase() === 'mode glimhaven') {
-            setMode('glimhaven');
-            return;
-        }
-
-        // RELIC command
-        if (trimmed.toLowerCase() === 'relic') {
-            onRelic();
-            return;
-        }
-
-        // WRITE command: "write <text>"
-        if (trimmed.toLowerCase().startsWith('write ')) {
-            const writeText = trimmed.slice(6).trim(); // remove "write "
-            if (writeText.length === 0) {
-                setFeedback("write what? e.g., write the river remembers", true);
-                return;
-            }
-            writeEntry(writeText);
-            return;
-        }
-
-        setFeedback(`unknown command: ${trimmed} · type 'help'`, true);
-    }
-
-    // ------------------------------------------------------------------
-    // 9. UI EVENT BINDING & INITIALIZATION (preserve existing experience)
-    // ------------------------------------------------------------------
-    function initUI() {
+    window.addEventListener('DOMContentLoaded', () => {
         const submitBtn = document.getElementById('submitBtn');
         submitBtn.addEventListener('click', () => {
             const val = commandInput.value;
@@ -579,7 +417,6 @@
             commandInput.value = '';
             commandInput.focus();
         });
-
         commandInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -588,31 +425,10 @@
                 commandInput.value = '';
             }
         });
-
-        // help close behaviour
-        const closeBtn = document.getElementById('closeHelpBtn');
-        closeBtn.addEventListener('click', hideHelpMenu);
-        helpOverlay.addEventListener('click', (e) => {
-            if (e.target === helpOverlay) hideHelpMenu();
-        });
-
-        lensBadge.innerHTML = currentMode === 'abbey' ? '⚜️ ABBEY LENS · demeter/athena' : '🌊 GLIMHAVEN LENS · poseidon/zeus';
+        document.getElementById('closeHelpBtn').addEventListener('click', hideHelp);
+        helpOverlay.addEventListener('click', (e) => { if (e.target === helpOverlay) hideHelp(); });
         setFeedback('grimoir ready · write, relic, or invoke help');
         commandInput.focus();
-    }
-
-    async function seedFirstRelic() {
-        const demoRelic = await fetchRelic(currentMode);
-        if (demoRelic) {
-            addRelicToUI(demoRelic, currentMode, currentMode, false);
-        } else {
-            addRelicToUI({ text: 'The Ealdforn archive breathes. Await the first relic.', created_at: null }, currentMode, 'start', false);
-        }
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        initUI();
-        seedFirstRelic();
     });
 </script>
 </body>
