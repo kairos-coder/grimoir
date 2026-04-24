@@ -62,7 +62,7 @@
         }
         .sub { font-size:0.6rem; font-family:monospace; color:var(--muted); letter-spacing:1px; margin-top:2px; }
         .band-legend { display:flex; gap:0.5rem; align-items:center; }
-        .band-pip { width:7px; height:7px; border-radius:50%; opacity:0.75; }
+        .band-pip { width:7px; height:7px; border-radius:50%; opacity:0.75; cursor:default; }
 
         /* Output */
         .output-area { flex:1; overflow-y:auto; padding:1.4rem 1.6rem; scroll-behavior:smooth; }
@@ -122,7 +122,6 @@
         .band-entry.apollo     .band-body { color:#9aaabb; font-size:0.85rem; font-style:italic; }
 
         .wc-tag { font-family:monospace; font-size:0.53rem; color:var(--dim); margin-left:auto; }
-
         .band-connector {
             width:1px; height:10px;
             background: linear-gradient(to bottom, var(--dim), transparent);
@@ -136,11 +135,18 @@
             border-left:3px solid var(--dim);
             animation: rise 0.3s ease forwards; opacity:0; transform:translateY(5px);
         }
-        .entry-card.inscribed { border-left-color:var(--zeus); }
-        .entry-card.system    { border-left-color:#3a4455; animation:none; opacity:1; transform:none; }
+        .entry-card.system { border-left-color:#3a4455; animation:none; opacity:1; transform:none; }
         .entry-meta { font-size:0.6rem; font-family:monospace; color:var(--muted); margin-bottom:0.3rem; }
         .entry-body { font-size:0.93rem; line-height:1.55; color:var(--text); }
         .entry-body.muted { color:var(--muted); font-style:italic; }
+
+        /* Write confirmation card — band-coloured */
+        .write-card {
+            background: rgba(15,18,28,0.5); border-radius:0.9rem;
+            padding:0.9rem 1.1rem; margin-bottom:1rem;
+            border-left:3px solid var(--dim);
+            animation: rise 0.35s ease forwards; opacity:0; transform:translateY(5px);
+        }
 
         mark { background:rgba(180,150,60,0.22); color:#e2c97a; border-radius:2px; padding:0 2px; }
 
@@ -151,10 +157,9 @@
             border-bottom:1px solid var(--border);
         }
 
-        /* find / band result card */
+        /* result card for find/band */
         .result-wrapper {
-            margin-bottom:0.9rem;
-            border-radius:0.9rem; overflow:hidden;
+            margin-bottom:0.9rem; border-radius:0.9rem; overflow:hidden;
             border: 1px solid rgba(100,115,135,0.15);
             animation: rise 0.3s ease forwards; opacity:0; transform:translateY(5px);
         }
@@ -208,7 +213,7 @@
         }
         .help-overlay.visible { visibility:visible; opacity:1; }
         .help-panel {
-            max-width:500px; width:88%; background:#0d1018;
+            max-width:520px; width:90%; background:#0d1018;
             border:1px solid rgba(100,115,135,0.3); border-radius:1.4rem;
             padding:1.8rem 2rem; position:relative;
         }
@@ -223,9 +228,12 @@
         .cmd-desc { color:var(--muted); font-size:0.76rem; line-height:1.4; }
         .close-help { position:absolute; top:1rem; right:1.2rem; font-size:1rem; cursor:pointer; color:var(--muted); background:none; border:none; font-family:monospace; }
         .close-help:hover { color:var(--text); }
-        .band-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.35rem 1.2rem; margin-top:0.7rem; }
-        .band-row { display:flex; align-items:center; gap:0.45rem; font-family:monospace; font-size:0.7rem; }
-        .band-swatch { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+        /* band table in help */
+        .band-table { width:100%; border-collapse:collapse; margin-top:0.7rem; }
+        .band-table td { font-family:monospace; font-size:0.68rem; padding:0.22rem 0.5rem; }
+        .band-table td:first-child { display:flex; align-items:center; gap:0.4rem; }
+        .band-swatch { width:7px; height:7px; border-radius:50%; flex-shrink:0; display:inline-block; }
 
         .pulse { animation:pulse 1.1s ease-in-out infinite; display:inline-block; }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
@@ -239,13 +247,13 @@
             <div class="sub">— spectral archive · all bands —</div>
         </div>
         <div class="band-legend">
-            <div class="band-pip" style="background:var(--hermes)"    title="hermes"></div>
-            <div class="band-pip" style="background:var(--apollo)"    title="apollo"></div>
-            <div class="band-pip" style="background:var(--hephaestus)"title="hephaestus"></div>
-            <div class="band-pip" style="background:var(--demeter)"   title="demeter"></div>
-            <div class="band-pip" style="background:var(--poseidon)"  title="poseidon"></div>
-            <div class="band-pip" style="background:var(--athena)"    title="athena"></div>
-            <div class="band-pip" style="background:var(--zeus);box-shadow:0 0 6px rgba(200,168,74,0.55);" title="zeus"></div>
+            <div class="band-pip" style="background:var(--hermes)"    title="hermes · 1-2w"></div>
+            <div class="band-pip" style="background:var(--apollo)"    title="apollo · 3-5w"></div>
+            <div class="band-pip" style="background:var(--hephaestus)"title="hephaestus · 6-10w"></div>
+            <div class="band-pip" style="background:var(--demeter)"   title="demeter · 11-20w"></div>
+            <div class="band-pip" style="background:var(--poseidon)"  title="poseidon · 21-35w"></div>
+            <div class="band-pip" style="background:var(--athena)"    title="athena · 36-50w"></div>
+            <div class="band-pip" style="background:var(--zeus);box-shadow:0 0 6px rgba(200,168,74,0.55);" title="zeus · 51w+"></div>
         </div>
     </div>
 
@@ -253,7 +261,7 @@
         <div class="entry-card system">
             <div class="entry-meta">◈ initium ◈</div>
             <div class="entry-body">
-                The Grimoir reads full evolution chains — seed to artifact.<br>
+                The Grimoir reads the spectral archive. <span style="color:var(--muted);font-size:0.84rem;">write</span> routes by word count automatically.<br>
                 <span style="color:var(--muted);font-size:0.84rem;">
                     <span style="color:#d4b96a;">relic</span> ·
                     <span style="color:#9ab3c9;">harvest</span> ·
@@ -283,25 +291,25 @@
             <button class="close-help" id="closeHelp">✕</button>
             <h3>⟡ Grimoir · Command Reference</h3>
             <ul>
-                <li><span class="cmd-name">relic</span><span class="cmd-desc">Surface a complete evolution chain — all bands from seed to artifact.</span></li>
-                <li><span class="cmd-name">harvest</span><span class="cmd-desc">Show the 5 most recent chains, anchored by zeus entries.</span></li>
+                <li><span class="cmd-name">relic</span><span class="cmd-desc">Surface a random entry from the archive.</span></li>
+                <li><span class="cmd-name">harvest</span><span class="cmd-desc">Show the 5 most recent zeus artifacts.</span></li>
                 <li><span class="cmd-name">find [text]</span><span class="cmd-desc">Search across all seven spectral tables. Matches highlighted per band.</span></li>
-                <li><span class="cmd-name">band [name]</span><span class="cmd-desc">Browse a specific level: hermes · apollo · hephaestus · demeter · poseidon · athena · zeus</span></li>
-                <li><span class="cmd-name">chain [id]</span><span class="cmd-desc">Pull a specific chain by evolution_chain_id or zeus entry id.</span></li>
-                <li><span class="cmd-name">write [text]</span><span class="cmd-desc">Inscribe a manual artifact directly into zeus_entries.</span></li>
+                <li><span class="cmd-name">band [name]</span><span class="cmd-desc">Browse a specific spectral level. hermes · apollo · hephaestus · demeter · poseidon · athena · zeus</span></li>
+                <li><span class="cmd-name">chain [id]</span><span class="cmd-desc">Pull a specific entry by id.</span></li>
+                <li>
+                    <span class="cmd-name">write [text]</span>
+                    <span class="cmd-desc">Inscribe text. Automatically routed to the correct band by word count:</span>
+                    <table class="band-table" style="margin-top:0.5rem;">
+                        <tr><td><span class="band-swatch" style="background:var(--hermes)"></span><span style="color:var(--hermes)">hermes</span></td><td style="color:var(--dim)">1-2 words</td></tr>
+                        <tr><td><span class="band-swatch" style="background:var(--apollo)"></span><span style="color:var(--apollo)">apollo</span></td><td style="color:var(--dim)">3-5 words</td></tr>
+                        <tr><td><span class="band-swatch" style="background:var(--hephaestus)"></span><span style="color:var(--hephaestus)">hephaestus</span></td><td style="color:var(--dim)">6-10 words</td></tr>
+                        <tr><td><span class="band-swatch" style="background:var(--demeter)"></span><span style="color:var(--demeter)">demeter</span></td><td style="color:var(--dim)">11-20 words</td></tr>
+                        <tr><td><span class="band-swatch" style="background:var(--poseidon)"></span><span style="color:var(--poseidon)">poseidon</span></td><td style="color:var(--dim)">21-35 words</td></tr>
+                        <tr><td><span class="band-swatch" style="background:var(--athena)"></span><span style="color:var(--athena)">athena</span></td><td style="color:var(--dim)">36-50 words</td></tr>
+                        <tr><td><span class="band-swatch" style="background:var(--zeus);box-shadow:0 0 4px rgba(200,168,74,0.4)"></span><span style="color:var(--zeus)">zeus</span></td><td style="color:var(--dim)">51+ words</td></tr>
+                    </table>
+                </li>
             </ul>
-            <div style="margin-top:1rem;padding-top:0.8rem;border-top:1px solid var(--border);">
-                <div style="font-family:monospace;font-size:0.58rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.5rem;">Spectral Bands</div>
-                <div class="band-grid">
-                    <div class="band-row"><span class="band-swatch" style="background:var(--hermes)"></span><span style="color:var(--hermes)">hermes</span><span style="color:var(--dim)"> 1-2w</span></div>
-                    <div class="band-row"><span class="band-swatch" style="background:var(--poseidon)"></span><span style="color:var(--poseidon)">poseidon</span><span style="color:var(--dim)"> 21-35w</span></div>
-                    <div class="band-row"><span class="band-swatch" style="background:var(--apollo)"></span><span style="color:var(--apollo)">apollo</span><span style="color:var(--dim)"> 3-5w</span></div>
-                    <div class="band-row"><span class="band-swatch" style="background:var(--athena)"></span><span style="color:var(--athena)">athena</span><span style="color:var(--dim)"> 36-50w</span></div>
-                    <div class="band-row"><span class="band-swatch" style="background:var(--hephaestus)"></span><span style="color:var(--hephaestus)">hephaestus</span><span style="color:var(--dim)"> 6-10w</span></div>
-                    <div class="band-row"><span class="band-swatch" style="background:var(--zeus);box-shadow:0 0 4px rgba(200,168,74,0.4)"></span><span style="color:var(--zeus)">zeus</span><span style="color:var(--dim)"> apex</span></div>
-                    <div class="band-row"><span class="band-swatch" style="background:var(--demeter)"></span><span style="color:var(--demeter)">demeter</span><span style="color:var(--dim)"> 11-20w</span></div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -311,17 +319,21 @@ const SB_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
 const SB_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
 
 const BANDS = [
-    { name:'hermes',     table:'hermes_entries',     color:'#6a7fa0', words:'1-2'   },
-    { name:'apollo',     table:'apollo_entries',     color:'#7a9e8a', words:'3-5'   },
-    { name:'hephaestus', table:'hephaestus_entries', color:'#9e8a5a', words:'6-10'  },
-    { name:'demeter',    table:'demeter_entries',    color:'#8a9e6a', words:'11-20' },
-    { name:'poseidon',   table:'poseidon_entries',   color:'#5a7a9e', words:'21-35' },
-    { name:'athena',     table:'athena_entries',     color:'#9e7a9e', words:'36-50' },
-    { name:'zeus',       table:'zeus_entries',       color:'#c8a84a', words:'apex'  },
+    { name:'hermes',     table:'hermes_entries',     color:'#6a7fa0', min:1,  max:2   },
+    { name:'apollo',     table:'apollo_entries',     color:'#7a9e8a', min:3,  max:5   },
+    { name:'hephaestus', table:'hephaestus_entries', color:'#9e8a5a', min:6,  max:10  },
+    { name:'demeter',    table:'demeter_entries',    color:'#8a9e6a', min:11, max:20  },
+    { name:'poseidon',   table:'poseidon_entries',   color:'#5a7a9e', min:21, max:35  },
+    { name:'athena',     table:'athena_entries',     color:'#9e7a9e', min:36, max:50  },
+    { name:'zeus',       table:'zeus_entries',       color:'#c8a84a', min:51, max:Infinity },
 ];
 const BAND_BY_NAME = {};
 BANDS.forEach(b => { BAND_BY_NAME[b.name] = b; });
 const BAND_ORDER = BANDS.map(b => b.name);
+
+function bandForWordCount(wc) {
+    return BANDS.find(b => wc >= b.min && wc <= b.max) || BANDS[BANDS.length - 1];
+}
 
 const outputDiv    = document.getElementById('outputArea');
 const commandInput = document.getElementById('commandInput');
@@ -329,7 +341,7 @@ const sysFeedback  = document.getElementById('sysFeedback');
 const helpOverlay  = document.getElementById('helpOverlay');
 let   fbTimer      = null;
 
-// ── Feedback ─────────────────────────────────────────────────────────────────
+// ── Feedback ──────────────────────────────────────────────────────────────────
 function setFeedback(msg, isError=false) {
     if (fbTimer) clearTimeout(fbTimer);
     sysFeedback.className = 'sys-feedback' + (isError ? ' error' : '');
@@ -347,7 +359,9 @@ function setLoading(msg) {
 
 // ── Utils ─────────────────────────────────────────────────────────────────────
 function esc(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function highlight(text, term) {
     if (!term) return esc(text);
@@ -366,6 +380,9 @@ function fmtDate(ts) {
 }
 function hexRgb(hex) {
     return `${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)}`;
+}
+function wordCount(text) {
+    return text.trim().split(/\s+/).filter(Boolean).length;
 }
 function addBanner(text) {
     const el = document.createElement('div');
@@ -398,51 +415,7 @@ async function sbPost(table, body) {
     if (!r.ok) { const t=await r.text(); throw new Error(`HTTP ${r.status}: ${t}`); }
 }
 
-// ── Chain rendering ───────────────────────────────────────────────────────────
-function renderChain(entries, delay=0, hlTerm=null) {
-    if (!entries || entries.length === 0) return;
-    const w = document.createElement('div');
-    w.className = 'chain-wrapper';
-    w.style.animationDelay = `${delay}ms`;
-
-    const chainId = entries[0]?.entry?.evolution_chain_id || entries[0]?.entry?.id || '—';
-    const latestTs = entries.reduce((d,{entry}) => {
-        const t = entry?.created_at; return t&&t>d?t:d;
-    }, '');
-
-    w.innerHTML = `
-        <div class="chain-header">
-            <span class="chain-id">⟡ chain · ${esc(String(chainId).slice(0,8))}</span>
-            <span class="chain-count">${entries.length} band${entries.length!==1?'s':''} · ${fmtDate(latestTs)}</span>
-        </div>
-    `;
-
-    entries.forEach(({band, entry}, i) => {
-        if (i > 0) {
-            const conn = document.createElement('div');
-            conn.className = 'band-connector';
-            w.appendChild(conn);
-        }
-        const el = document.createElement('div');
-        el.className = `band-entry ${band.name}`;
-        const raw = entry?.body || '';
-        const wc  = entry?.word_count || raw.split(/\s+/).filter(Boolean).length;
-        const bodyHtml = hlTerm ? highlight(fmt(raw), hlTerm) : esc(fmt(raw));
-        el.innerHTML = `
-            <div class="band-label">
-                <span class="dot" style="background:${band.color}"></span>
-                ${esc(band.name)}
-                <span class="wc-tag">${wc}w</span>
-            </div>
-            <div class="band-body">${bodyHtml}</div>
-        `;
-        w.appendChild(el);
-    });
-
-    outputDiv.appendChild(w);
-    w.scrollIntoView({ behavior:'smooth', block:'nearest' });
-}
-
+// ── Render helpers ────────────────────────────────────────────────────────────
 function renderResultCard(band, entry, delay=0, hlTerm=null) {
     const w = document.createElement('div');
     w.className = 'result-wrapper';
@@ -450,11 +423,11 @@ function renderResultCard(band, entry, delay=0, hlTerm=null) {
     w.style.borderColor = `rgba(${hexRgb(band.color)},0.18)`;
 
     const raw  = entry?.body || '';
-    const wc   = entry?.word_count || raw.split(/\s+/).filter(Boolean).length;
+    const wc   = entry?.word_count || wordCount(raw);
     const body = hlTerm ? highlight(fmt(raw), hlTerm) : esc(fmt(raw));
 
     w.innerHTML = `
-        <div class="result-header" style="background:rgba(${hexRgb(band.color)},0.06); border-bottom:1px solid rgba(${hexRgb(band.color)},0.1);">
+        <div class="result-header" style="background:rgba(${hexRgb(band.color)},0.06);border-bottom:1px solid rgba(${hexRgb(band.color)},0.1);">
             <span class="result-band-name" style="color:${band.color};">
                 <span style="width:6px;height:6px;border-radius:50%;background:${band.color};display:inline-block;"></span>
                 ${esc(band.name)}
@@ -470,70 +443,50 @@ function renderResultCard(band, entry, delay=0, hlTerm=null) {
     w.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
-// ── Chain assembly ────────────────────────────────────────────────────────────
-async function buildChain(zeusEntry) {
-    const chainId = zeusEntry?.evolution_chain_id;
-    const result  = [];
-
-    if (chainId) {
-        await Promise.all(BANDS.map(async band => {
-            try {
-                const data = await sbGet(band.table,
-                    `?select=id,body,word_count,created_at,evolution_chain_id&evolution_chain_id=eq.${encodeURIComponent(chainId)}&limit=1`
-                );
-                if (data?.length > 0) result.push({ band, entry: data[0] });
-            } catch(_) {}
-        }));
-    }
-
-    // Fallback: time-window (90s) if chain id linkage yielded only zeus
-    if (result.length <= 1 && zeusEntry?.created_at) {
-        const ts = new Date(zeusEntry.created_at).getTime();
-        const lo = new Date(ts - 90000).toISOString();
-        const hi = new Date(ts + 90000).toISOString();
-        await Promise.all(BANDS.filter(b=>b.name!=='zeus').map(async band => {
-            try {
-                const data = await sbGet(band.table,
-                    `?select=id,body,word_count,created_at&created_at=gte.${encodeURIComponent(lo)}&created_at=lte.${encodeURIComponent(hi)}&order=created_at.asc&limit=1`
-                );
-                if (data?.length > 0) {
-                    // don't duplicate
-                    if (!result.some(r=>r.band.name===band.name)) result.push({ band, entry: data[0] });
-                }
-            } catch(_) {}
-        }));
-    }
-
-    // Ensure zeus itself is in
-    if (!result.some(r=>r.band.name==='zeus')) result.push({ band:BAND_BY_NAME['zeus'], entry:zeusEntry });
-    result.sort((a,b) => BAND_ORDER.indexOf(a.band.name) - BAND_ORDER.indexOf(b.band.name));
-    return result;
+function renderWriteCard(band, entry) {
+    const raw = entry?.body || '';
+    const wc  = entry?.word_count || wordCount(raw);
+    const w   = document.createElement('div');
+    w.className = 'write-card';
+    w.style.borderLeftColor = band.color;
+    w.innerHTML = `
+        <div class="entry-meta" style="color:${band.color};">
+            ✍ inscribed · <span style="letter-spacing:1px;">${esc(band.name)}</span> · ${fmtDate(new Date().toISOString())}
+        </div>
+        <div class="entry-body">${esc(fmt(raw))}</div>
+        <div style="font-family:monospace;font-size:0.53rem;color:var(--dim);margin-top:0.3rem;">${wc}w</div>
+    `;
+    outputDiv.appendChild(w);
+    w.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 // ── Commands ──────────────────────────────────────────────────────────────────
 async function onRelic() {
-    setLoading('summoning a chain…');
+    setLoading('summoning a relic…');
     try {
-        const data = await sbGet('zeus_entries','?select=id,body,word_count,created_at,evolution_chain_id&limit=60');
-        if (!data?.length) { addSystemCard('The archive is silent. Write something.'); setFeedback('archive empty'); return; }
-        const z = data[Math.floor(Math.random()*data.length)];
-        const chain = await buildChain(z);
-        renderChain(chain);
-        setFeedback(`chain surfaced · ${chain.length} band${chain.length!==1?'s':''}`);
+        // Pick a random band weighted by row count, then pull a random entry
+        const pick = BANDS[Math.floor(Math.random() * BANDS.length)];
+        const data = await sbGet(pick.table, '?select=id,body,word_count,created_at&limit=50');
+        if (!data?.length) {
+            // fallback to zeus
+            const z = await sbGet('zeus_entries', '?select=id,body,word_count,created_at&limit=50');
+            if (!z?.length) { addSystemCard('The archive is silent.'); setFeedback('archive empty'); return; }
+            renderResultCard(BAND_BY_NAME['zeus'], z[Math.floor(Math.random()*z.length)]);
+        } else {
+            renderResultCard(pick, data[Math.floor(Math.random()*data.length)]);
+        }
+        setFeedback(`relic surfaced · ${pick.name}`);
     } catch(e) { console.error(e); setFeedback('could not reach the archive', true); }
 }
 
 async function onHarvest() {
-    setLoading('harvesting recent chains…');
+    setLoading('harvesting recent artifacts…');
     try {
-        const data = await sbGet('zeus_entries','?select=id,body,word_count,created_at,evolution_chain_id&order=created_at.desc&limit=5');
+        const data = await sbGet('zeus_entries', '?select=id,body,word_count,created_at&order=created_at.desc&limit=5');
         if (!data?.length) { addSystemCard('Nothing to harvest yet.'); setFeedback('archive empty'); return; }
-        addBanner(`⚱ harvest — ${data.length} most recent chain${data.length!==1?'s':''}`);
-        for (let i=0; i<data.length; i++) {
-            const chain = await buildChain(data[i]);
-            renderChain(chain, i*100);
-        }
-        setFeedback(`${data.length} chain${data.length!==1?'s':''} harvested`);
+        addBanner(`⚱ harvest — ${data.length} most recent zeus artifact${data.length!==1?'s':''}`);
+        data.forEach((entry,i) => renderResultCard(BAND_BY_NAME['zeus'], entry, i*80));
+        setFeedback(`${data.length} artifact${data.length!==1?'s':''} harvested`);
     } catch(e) { console.error(e); setFeedback('harvest failed', true); }
 }
 
@@ -561,13 +514,12 @@ async function onFind(term) {
 
         allResults.sort((a,b) => {
             const oi = BAND_ORDER.indexOf(a.band.name) - BAND_ORDER.indexOf(b.band.name);
-            if (oi!==0) return oi;
-            return new Date(b.entry.created_at) - new Date(a.entry.created_at);
+            return oi !== 0 ? oi : new Date(b.entry.created_at) - new Date(a.entry.created_at);
         });
 
         const bandSet = new Set(allResults.map(r=>r.band.name));
         addBanner(`🔍 find: "${t}" — ${allResults.length} passage${allResults.length!==1?'s':''} across ${bandSet.size} band${bandSet.size!==1?'s':''}`);
-        allResults.forEach(({band, entry}, i) => renderResultCard(band, entry, i*45, t));
+        allResults.forEach(({band,entry},i) => renderResultCard(band, entry, i*45, t));
         setFeedback(`${allResults.length} passage${allResults.length!==1?'s':''} found`);
     } catch(e) { console.error(e); setFeedback('search failed', true); }
 }
@@ -577,7 +529,7 @@ async function onBand(bandName) {
     if (!b) { setFeedback('unknown band · hermes apollo hephaestus demeter poseidon athena zeus', true); return; }
     setLoading(`reading ${b.name}…`);
     try {
-        const data = await sbGet(b.table,'?select=id,body,word_count,created_at&order=created_at.desc&limit=10');
+        const data = await sbGet(b.table, '?select=id,body,word_count,created_at&order=created_at.desc&limit=10');
         if (!data?.length) { addSystemCard(`${b.name} is silent.`); setFeedback(`${b.name} has no entries`); return; }
         addBanner(`◈ ${b.name} — ${data.length} passage${data.length!==1?'s':''}`);
         data.forEach((entry,i) => renderResultCard(b, entry, i*50));
@@ -588,66 +540,68 @@ async function onBand(bandName) {
 async function onChain(id) {
     if (!id?.trim()) { setFeedback('chain [id] required', true); return; }
     const trimId = id.trim();
-    setLoading(`assembling chain ${trimId.slice(0,8)}…`);
+    setLoading(`retrieving ${trimId.slice(0,8)}…`);
     try {
-        let zeusEntry = null;
-        // try by evolution_chain_id
-        try {
-            const d = await sbGet('zeus_entries',
-                `?select=id,body,word_count,created_at,evolution_chain_id&evolution_chain_id=eq.${encodeURIComponent(trimId)}&limit=1`
-            );
-            if (d?.length) zeusEntry = d[0];
-        } catch(_) {}
-        // try by zeus id
-        if (!zeusEntry) {
+        // Search all bands for this id
+        let found = null;
+        let foundBand = null;
+        for (const band of BANDS) {
             try {
-                const d = await sbGet('zeus_entries',
-                    `?select=id,body,word_count,created_at,evolution_chain_id&id=eq.${encodeURIComponent(trimId)}&limit=1`
-                );
-                if (d?.length) zeusEntry = d[0];
+                const d = await sbGet(band.table, `?select=id,body,word_count,created_at&id=eq.${encodeURIComponent(trimId)}&limit=1`);
+                if (d?.length) { found = d[0]; foundBand = band; break; }
             } catch(_) {}
         }
-        if (!zeusEntry) { addSystemCard(`No chain found for: ${trimId}`); setFeedback('chain not found', true); return; }
-        const chain = await buildChain(zeusEntry);
-        renderChain(chain);
-        setFeedback(`chain assembled · ${chain.length} band${chain.length!==1?'s':''}`);
-    } catch(e) { console.error(e); setFeedback('chain retrieval failed', true); }
+        if (!found) { addSystemCard(`No entry found for id: ${trimId}`); setFeedback('not found', true); return; }
+        renderResultCard(foundBand, found);
+        setFeedback(`entry retrieved · ${foundBand.name}`);
+    } catch(e) { console.error(e); setFeedback('retrieval failed', true); }
 }
 
 async function onWrite(text) {
     if (!text?.trim()) { setFeedback('write what?', true); return; }
     const trimmed = text.trim();
-    setLoading('inscribing…');
-    const label = `grimoir_${trimmed.split(/\s+/).slice(0,3).join('_')}_${Date.now()}`;
+    const wc      = wordCount(trimmed);
+    const band    = bandForWordCount(wc);
+
+    setLoading(`routing to ${band.name}…`);
+
+    const firstWords = trimmed.split(/\s+/).slice(0,3).join('_');
+    const label = `grimoir_${firstWords}_${Date.now()}`;
+
     try {
-        await sbPost('zeus_entries', {
-            label, body:trimmed,
-            word_count: trimmed.split(/\s+/).filter(Boolean).length,
+        await sbPost(band.table, {
+            label,
+            body: trimmed,
+            word_count: wc,
             created_at: new Date().toISOString()
         });
-        const c = document.createElement('div');
-        c.className = 'entry-card inscribed';
-        c.innerHTML = `<div class="entry-meta">✍ inscribed · zeus · ${new Date().toLocaleString()}</div><div class="entry-body">${esc(fmt(trimmed))}</div>`;
-        outputDiv.appendChild(c);
-        c.scrollIntoView({behavior:'smooth',block:'nearest'});
-        setFeedback('✧ artifact inscribed into zeus');
-    } catch(e) { console.error(e); setFeedback(`could not inscribe: ${e.message.slice(0,80)}`, true); }
+        renderWriteCard(band, { body: trimmed, word_count: wc });
+        setFeedback(`✧ inscribed · ${band.name} · ${wc}w`);
+    } catch(e) {
+        console.error(e);
+        // If constraint violation, tell the user clearly
+        if (e.message.includes('violates check constraint')) {
+            setFeedback(`word count ${wc} rejected by ${band.name} constraint`, true);
+        } else {
+            setFeedback(`could not inscribe: ${e.message.slice(0,60)}`, true);
+        }
+    }
 }
 
 // ── Dispatch ──────────────────────────────────────────────────────────────────
 async function dispatch(raw) {
-    const cmd   = raw.trim();
+    const cmd  = raw.trim();
     const lower = cmd.toLowerCase();
     const parts = cmd.split(/\s+/);
     const verb  = parts[0].toLowerCase();
 
-    if (lower==='relic')    return onRelic();
-    if (lower==='harvest')  return onHarvest();
-    if (lower==='help')     { helpOverlay.classList.add('visible'); return; }
-    if (verb==='find')      return onFind(parts.slice(1).join(' '));
-    if (verb==='band')      return onBand(parts[1]);
-    if (verb==='chain')     return onChain(parts.slice(1).join(' '));
-    if (verb==='write')     return onWrite(parts.slice(1).join(' '));
+    if (lower==='relic')   return onRelic();
+    if (lower==='harvest') return onHarvest();
+    if (lower==='help')    { helpOverlay.classList.add('visible'); return; }
+    if (verb==='find')     return onFind(parts.slice(1).join(' '));
+    if (verb==='band')     return onBand(parts[1]);
+    if (verb==='chain')    return onChain(parts.slice(1).join(' '));
+    if (verb==='write')    return onWrite(parts.slice(1).join(' '));
     setFeedback(`unknown: "${cmd}" · type help`, true);
 }
 
@@ -674,7 +628,7 @@ window.addEventListener('DOMContentLoaded', () => {
         if (e.target===helpOverlay) { helpOverlay.classList.remove('visible'); commandInput.focus(); }
     });
     document.addEventListener('keydown', e => {
-        if (e.key==='Escape'&&helpOverlay.classList.contains('visible')) {
+        if (e.key==='Escape' && helpOverlay.classList.contains('visible')) {
             helpOverlay.classList.remove('visible'); commandInput.focus();
         }
     });
