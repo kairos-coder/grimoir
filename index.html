@@ -922,7 +922,27 @@ function init() {
   log('pact', '🜚 Grimoir awakens. The bargain is struck. Swipe between the six rites.');
   log('tome', '⚓ The Tome opens. Choose a persona to begin.');
 }
-document.addEventListener('DOMContentLoaded', init);
+
+  // ============================================================
+// EXPOSE TO GLOBAL SCOPE (for inline onclick handlers in module)
+// ============================================================
+window.selectPersona = selectPersona;
+window.selectVariation = selectVariation;
+window.tomeClear = tomeClear;
+window.tomeSend = tomeSend;
+window.bindingSuggest = bindingSuggest;
+window.bindingPick = bindingPick;
+window.bindingSeal = bindingSeal;
+window.quillAtmosphere = quillAtmosphere;
+window.quillInscribe = quillInscribe;
+window.inkwellMutate = inkwellMutate;
+window.inkwellWrite = inkwellWrite;
+window.inkwellChoose = inkwellChoose;
+window.thresholdTheme = thresholdTheme;
+window.thresholdLoop = thresholdLoop;
+window.pactSetTelos = pactSetTelos;
+window.pactLineage = pactLineage;
+  document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
