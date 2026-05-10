@@ -1,640 +1,928 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Ealdforn Abbey · The Grimoir</title>
-    <style>
-        :root {
-            --bg:        #08090f;
-            --surface:   #0d1018;
-            --border:    rgba(100, 115, 135, 0.22);
-            --text:      #dde0ea;
-            --muted:     #7a8898;
-            --dim:       #3a4455;
-            --hermes:    #6a7fa0;
-            --apollo:    #7a9e8a;
-            --hephaestus:#9e8a5a;
-            --demeter:   #8a9e6a;
-            --poseidon:  #5a7a9e;
-            --athena:    #9e7a9e;
-            --zeus:      #c8a84a;
-            --chain-glow: rgba(200, 168, 74, 0.05);
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            background: var(--bg);
-            background-image:
-                radial-gradient(ellipse at 20% 50%, #0f1520 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, #100f18 0%, transparent 55%);
-            min-height: 100vh;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Palatino Linotype','Palatino','Book Antiqua','Georgia',serif;
-            padding: 1rem;
-        }
-        .grimoir {
-            max-width: 880px; width: 100%;
-            background: rgba(10,12,20,0.92);
-            border: 1px solid var(--border);
-            border-radius: 1.8rem;
-            display: flex; flex-direction: column;
-            height: 88vh; min-height: 580px;
-            position: relative; overflow: hidden;
-        }
-        .grimoir::before {
-            content:''; position:absolute; inset:0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-            pointer-events:none; border-radius:inherit; z-index:0;
-        }
-        .grimoir > * { position:relative; z-index:1; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GRIMOIR · The Faustian Engine</title>
+<style>
+  :root {
+    --bg: #0d0d12;
+    --panel: #13131c;
+    --text: #c8c8d4;
+    --muted: #6b6b7b;
+    --gold: #c9a050;
+    --blood: #8b3a3a;
+    --ink: #3a3a5c;
+    --parchment: #1e1c18;
+    --radius: 10px;
+    --touch: 48px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none; -webkit-user-select: none;
+  }
 
-        /* Header */
-        .grimoir-header {
-            padding: 1.1rem 1.8rem 0.9rem;
-            border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-            flex-shrink: 0;
-        }
-        .title {
-            font-size: 1.15rem; letter-spacing: 4px;
-            background: linear-gradient(120deg,#ece8dc 0%,#a8b4be 100%);
-            -webkit-background-clip:text; background-clip:text; color:transparent;
-        }
-        .sub { font-size:0.6rem; font-family:monospace; color:var(--muted); letter-spacing:1px; margin-top:2px; }
-        .band-legend { display:flex; gap:0.5rem; align-items:center; }
-        .band-pip { width:7px; height:7px; border-radius:50%; opacity:0.75; cursor:default; }
+  /* Scroll-snap container */
+  .ouroboros {
+    display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
+    scroll-behavior: smooth; height: 100dvh; width: 100vw;
+  }
+  .ouroboros::-webkit-scrollbar { display:none; }
 
-        /* Output */
-        .output-area { flex:1; overflow-y:auto; padding:1.4rem 1.6rem; scroll-behavior:smooth; }
-        .output-area::-webkit-scrollbar { width:3px; }
-        .output-area::-webkit-scrollbar-thumb { background:rgba(100,115,135,0.25); border-radius:3px; }
+  .god-panel {
+    flex: 0 0 100vw; scroll-snap-align: center;
+    display: flex; flex-direction: column; height: 100dvh;
+    border-right: 1px solid #1e1e2a; background: var(--panel);
+    overflow-y: auto;
+  }
 
-        /* Chain wrapper */
-        .chain-wrapper {
-            margin-bottom: 1.4rem;
-            background: var(--chain-glow);
-            border: 1px solid rgba(200,168,74,0.1);
-            border-radius: 1.2rem; overflow: hidden;
-            animation: rise 0.4s ease forwards;
-            opacity: 0; transform: translateY(8px);
-        }
-        @keyframes rise { to { opacity:1; transform:translateY(0); } }
+  /* Gothic header */
+  .telos-bar {
+    background: #0a0a0f; border-bottom: 2px solid #2a1a1a;
+    padding: 10px 14px; font-size: 0.7rem; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--gold); text-align: center;
+    min-height: 40px; display: flex; align-items: center;
+    justify-content: center; gap: 8px; flex-shrink: 0;
+    position: sticky; top: 0; z-index: 10;
+    font-family: 'Courier New', monospace;
+  }
+  .telos-dot { width:6px; height:6px; background:var(--blood); border-radius:50%; animation:flicker 3s infinite; }
+  @keyframes flicker { 0%,100%{opacity:0.4} 50%{opacity:1} 30%,70%{opacity:0.7} }
 
-        .chain-header {
-            padding: 0.55rem 1.1rem;
-            background: rgba(200,168,74,0.04);
-            border-bottom: 1px solid rgba(200,168,74,0.09);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .chain-id   { font-family:monospace; font-size:0.58rem; color:rgba(200,168,74,0.45); letter-spacing:1px; }
-        .chain-count{ font-family:monospace; font-size:0.58rem; color:var(--muted); }
+  .terminal {
+    background: #09090f; border-bottom: 1px solid #1e1e2a;
+    padding: 6px 12px; font-size: 0.58rem; color: var(--muted);
+    max-height: 70px; overflow-y: auto; flex-shrink: 0; line-height: 1.4;
+    font-family: 'Courier New', monospace;
+  }
+  .terminal .line { opacity:0.6; }
+  .terminal .line.latest { color:var(--blood); opacity:1; }
 
-        .band-entry {
-            padding: 0.72rem 1.1rem;
-            border-left: 3px solid var(--dim);
-            margin: 0.45rem 0.8rem;
-            border-radius: 0 0.45rem 0.45rem 0;
-        }
-        .band-entry.hermes     { border-left-color: var(--hermes); }
-        .band-entry.apollo     { border-left-color: var(--apollo); }
-        .band-entry.hephaestus { border-left-color: var(--hephaestus); }
-        .band-entry.demeter    { border-left-color: var(--demeter); }
-        .band-entry.poseidon   { border-left-color: var(--poseidon); }
-        .band-entry.athena     { border-left-color: var(--athena); }
-        .band-entry.zeus       { border-left-color: var(--zeus); background:rgba(200,168,74,0.03); }
+  .god-buttons { display:flex; gap:6px; padding:8px 10px; flex-shrink:0; }
+  .god-btn {
+    flex:1; min-height: var(--touch); border:1px solid #2a1a1a;
+    background: #1a1520; color: var(--text); font-family: 'Georgia', serif;
+    font-size: 0.75rem; border-radius: var(--radius); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    transition: all 0.15s;
+  }
+  .god-btn:active { background:#2a1a25; border-color:var(--blood); }
+  .god-btn.primary { background:#1a1020; border-color:var(--gold); color:var(--gold); }
 
-        .band-label {
-            font-family:monospace; font-size:0.57rem; letter-spacing:2px; text-transform:uppercase;
-            margin-bottom:0.28rem; display:flex; align-items:center; gap:0.4rem;
-        }
-        .band-label .dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
-        .band-entry.hermes     .band-label { color:var(--hermes); }
-        .band-entry.apollo     .band-label { color:var(--apollo); }
-        .band-entry.hephaestus .band-label { color:var(--hephaestus); }
-        .band-entry.demeter    .band-label { color:var(--demeter); }
-        .band-entry.poseidon   .band-label { color:var(--poseidon); }
-        .band-entry.athena     .band-label { color:var(--athena); }
-        .band-entry.zeus       .band-label { color:var(--zeus); }
+  .queue { flex-shrink:0; padding:0 10px; max-height:80px; overflow-y:auto; }
+  .queue-label {
+    font-size:0.55rem; text-transform:uppercase; letter-spacing:0.1em;
+    color:var(--muted); padding:4px 0; position:sticky; top:0;
+    background:var(--panel); font-family:'Courier New',monospace;
+  }
+  .queue-item {
+    background:#14141e; border:1px solid #1e1e2a; border-radius:4px;
+    padding:4px 6px; margin-bottom:2px; font-size:0.6rem;
+    display:flex; align-items:center; gap:4px;
+  }
+  .queue-item .text { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-        .band-body { font-size:0.92rem; line-height:1.56; color:var(--text); }
-        .band-entry.zeus       .band-body { color:#ede8d8; font-size:0.97rem; }
-        .band-entry.hermes     .band-body,
-        .band-entry.apollo     .band-body { color:#9aaabb; font-size:0.85rem; font-style:italic; }
+  .output-area {
+    flex:1; padding:10px; display:flex; flex-direction:column;
+    align-items:center; justify-content:flex-start; min-height:150px;
+    overflow-y:auto;
+  }
+  .output-placeholder { color:var(--muted); font-size:0.7rem; text-align:center; opacity:0.5; margin-top:40px; }
 
-        .wc-tag { font-family:monospace; font-size:0.53rem; color:var(--dim); margin-left:auto; }
-        .band-connector {
-            width:1px; height:10px;
-            background: linear-gradient(to bottom, var(--dim), transparent);
-            margin: 0 0 0 calc(0.8rem + 3px + 0.45rem); opacity:0.4;
-        }
+  /* Passage styling */
+  .passage {
+    font-family: 'Georgia', serif;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    color: #d4d0c8;
+    padding: 16px;
+    background: var(--parchment);
+    border: 1px solid #2a2018;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 6px 0;
+    text-align: left;
+    font-style: italic;
+  }
+  .choice-btn {
+    display: block;
+    width: 100%;
+    max-width: 600px;
+    padding: 10px 14px;
+    margin: 3px 0;
+    background: #1a1520;
+    border: 1px solid #2a1a1a;
+    border-radius: 6px;
+    color: var(--gold);
+    font-family: 'Georgia', serif;
+    font-size: 0.72rem;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+  }
+  .choice-btn:active { background:#2a1a25; border-color:var(--blood); }
 
-        /* Simple cards */
-        .entry-card {
-            background: rgba(15,18,28,0.5); border-radius:0.9rem;
-            padding:0.9rem 1.1rem; margin-bottom:1rem;
-            border-left:3px solid var(--dim);
-            animation: rise 0.3s ease forwards; opacity:0; transform:translateY(5px);
-        }
-        .entry-card.system { border-left-color:#3a4455; animation:none; opacity:1; transform:none; }
-        .entry-meta { font-size:0.6rem; font-family:monospace; color:var(--muted); margin-bottom:0.3rem; }
-        .entry-body { font-size:0.93rem; line-height:1.55; color:var(--text); }
-        .entry-body.muted { color:var(--muted); font-style:italic; }
+  /* Quest Map */
+  .map-container {
+    width: 100%;
+    max-width: 600px;
+    height: 180px;
+    background: #0a0a0f;
+    border: 1px solid #1e1e2a;
+    border-radius: 8px;
+    margin: 6px 0;
+    overflow: hidden;
+  }
+  .map-container svg { width:100%; height:100%; }
+  .map-label {
+    font-size: 0.5rem;
+    fill: var(--muted);
+    font-family: 'Courier New', monospace;
+    text-anchor: middle;
+  }
+  .map-label.current { fill: var(--gold); font-weight:bold; }
 
-        /* Write confirmation card — band-coloured */
-        .write-card {
-            background: rgba(15,18,28,0.5); border-radius:0.9rem;
-            padding:0.9rem 1.1rem; margin-bottom:1rem;
-            border-left:3px solid var(--dim);
-            animation: rise 0.35s ease forwards; opacity:0; transform:translateY(5px);
-        }
+  /* Nav hint */
+  .nav-hint {
+    position:fixed; bottom:6px; left:50%; transform:translateX(-50%);
+    font-size:0.45rem; color:var(--muted); z-index:20; pointer-events:none;
+    display:flex; gap:10px; font-family:'Courier New',monospace;
+  }
+  .nav-hint span { opacity:0.3; }
+  .nav-hint span.active { opacity:1; color:var(--blood); }
 
-        mark { background:rgba(180,150,60,0.22); color:#e2c97a; border-radius:2px; padding:0 2px; }
+  /* Persona grid */
+  .persona-grid {
+    display:grid; grid-template-columns:repeat(2,1fr); gap:5px; padding:8px 10px;
+  }
+  .persona-card {
+    background:#14141e; border:1px solid #1e1e2a; border-radius:8px;
+    padding:8px 4px; text-align:center; cursor:pointer; transition:all 0.15s;
+    font-size:0.6rem;
+  }
+  .persona-card:active { background:#1a1525; border-color:var(--blood); }
+  .persona-card .emoji { font-size:1.3rem; display:block; margin-bottom:2px; }
+  .persona-card.selected { border-color:var(--gold); background:#1a1520; }
+  .variation-row { display:flex; gap:4px; padding:4px 10px; }
+  .variation-chip {
+    flex:1; padding:6px 3px; background:#181825; border:1px solid #1e1e2a;
+    border-radius:6px; text-align:center; font-size:0.6rem; cursor:pointer;
+  }
+  .variation-chip:active { background:#251a25; border-color:var(--blood); }
+  .variation-chip.chosen { border-color:var(--blood); background:#1a1520; color:var(--blood); }
 
-        .section-banner {
-            font-family:monospace; font-size:0.6rem; color:var(--muted);
-            letter-spacing:2px; text-transform:uppercase;
-            padding:0.3rem 0.4rem; margin-bottom:0.7rem;
-            border-bottom:1px solid var(--border);
-        }
-
-        /* result card for find/band */
-        .result-wrapper {
-            margin-bottom:0.9rem; border-radius:0.9rem; overflow:hidden;
-            border: 1px solid rgba(100,115,135,0.15);
-            animation: rise 0.3s ease forwards; opacity:0; transform:translateY(5px);
-        }
-        .result-header {
-            padding:0.45rem 1rem;
-            display:flex; justify-content:space-between; align-items:center;
-        }
-        .result-band-name { font-family:monospace; font-size:0.57rem; letter-spacing:2px; text-transform:uppercase; display:flex; align-items:center; gap:0.4rem; }
-        .result-date      { font-family:monospace; font-size:0.57rem; color:var(--muted); }
-        .result-body-wrap { padding:0.7rem 1.1rem 0.7rem; border-left-width:3px; border-left-style:solid; margin:0.4rem 0.7rem 0.6rem; border-radius:0 0.4rem 0.4rem 0; }
-        .result-body      { font-size:0.91rem; line-height:1.55; color:var(--text); }
-        .result-wc        { font-family:monospace; font-size:0.53rem; color:var(--dim); margin-top:0.25rem; }
-
-        /* Bottom bar */
-        .bottom-bar {
-            border-top:1px solid var(--border);
-            background: rgba(6,8,14,0.9);
-            flex-shrink:0; border-radius:0 0 1.8rem 1.8rem;
-        }
-        .feedback-row { padding:0.3rem 1.4rem 0; display:flex; justify-content:flex-end; }
-        .sys-feedback {
-            font-size:0.6rem; font-family:monospace; color:var(--muted);
-            background:rgba(15,18,28,0.8); padding:0.2rem 0.7rem; border-radius:20px;
-        }
-        .sys-feedback.error { color:#b07070; }
-        .command-row { padding:0.7rem 1.2rem 0.9rem; display:flex; gap:0.6rem; align-items:center; }
-        .prompt { font-family:monospace; color:var(--muted); font-size:0.9rem; flex-shrink:0; }
-        #commandInput {
-            flex:1; background:rgba(15,18,28,0.9);
-            border:1px solid rgba(80,95,115,0.3); color:#eef0f5;
-            padding:0.55rem 1rem; font-family:monospace; font-size:0.82rem;
-            border-radius:50px; outline:none; transition:border-color 0.2s;
-        }
-        #commandInput:focus { border-color:rgba(140,120,60,0.4); }
-        #commandInput::placeholder { color:#2e3848; }
-        .invoke-btn {
-            background:rgba(30,36,52,0.9); border:1px solid rgba(80,95,115,0.3);
-            color:#c8bfa8; padding:0.5rem 1.1rem; border-radius:40px; cursor:pointer;
-            font-family:'Palatino Linotype','Palatino',Georgia,serif; font-size:0.82rem;
-            transition:background 0.2s,border-color 0.2s; flex-shrink:0;
-        }
-        .invoke-btn:hover { background:rgba(45,54,76,0.9); border-color:rgba(140,120,60,0.3); }
-
-        /* Help */
-        .help-overlay {
-            position:absolute; inset:0;
-            background:rgba(5,7,12,0.97); backdrop-filter:blur(10px);
-            z-index:200; display:flex; align-items:center; justify-content:center;
-            visibility:hidden; opacity:0; transition:opacity 0.2s,visibility 0.2s;
-            border-radius:inherit;
-        }
-        .help-overlay.visible { visibility:visible; opacity:1; }
-        .help-panel {
-            max-width:520px; width:90%; background:#0d1018;
-            border:1px solid rgba(100,115,135,0.3); border-radius:1.4rem;
-            padding:1.8rem 2rem; position:relative;
-        }
-        .help-panel h3 {
-            font-size:0.62rem; font-family:monospace; letter-spacing:3px;
-            text-transform:uppercase; color:var(--muted);
-            margin-bottom:1.1rem; padding-bottom:0.6rem; border-bottom:1px solid var(--border);
-        }
-        .help-panel ul { list-style:none; }
-        .help-panel li { margin-bottom:0.9rem; padding-left:1rem; border-left:2px solid var(--dim); }
-        .cmd-name { font-family:monospace; color:#d4b96a; font-size:0.85rem; display:block; margin-bottom:0.12rem; }
-        .cmd-desc { color:var(--muted); font-size:0.76rem; line-height:1.4; }
-        .close-help { position:absolute; top:1rem; right:1.2rem; font-size:1rem; cursor:pointer; color:var(--muted); background:none; border:none; font-family:monospace; }
-        .close-help:hover { color:var(--text); }
-
-        /* band table in help */
-        .band-table { width:100%; border-collapse:collapse; margin-top:0.7rem; }
-        .band-table td { font-family:monospace; font-size:0.68rem; padding:0.22rem 0.5rem; }
-        .band-table td:first-child { display:flex; align-items:center; gap:0.4rem; }
-        .band-swatch { width:7px; height:7px; border-radius:50%; flex-shrink:0; display:inline-block; }
-
-        .pulse { animation:pulse 1.1s ease-in-out infinite; display:inline-block; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
-    </style>
+  .chord-bar {
+    display:flex; gap:4px; padding:4px 10px; align-items:center;
+    justify-content:center; font-size:0.6rem; flex-wrap:wrap;
+    font-family:'Courier New',monospace;
+  }
+  .chord-slot {
+    background:#1a1a28; border:1px dashed #2a2a3a; border-radius:6px;
+    padding:6px 8px; text-align:center; font-size:0.55rem; min-width:40px;
+  }
+  .chord-slot.filled { border-color:var(--gold); border-style:solid; }
+  .chord-arrow { color:var(--muted); }
+</style>
 </head>
 <body>
-<div class="grimoir">
-    <div class="grimoir-header">
-        <div>
-            <div class="title">Ealdforn Grimoir</div>
-            <div class="sub">— spectral archive · all bands —</div>
-        </div>
-        <div class="band-legend">
-            <div class="band-pip" style="background:var(--hermes)"    title="hermes · 1-2w"></div>
-            <div class="band-pip" style="background:var(--apollo)"    title="apollo · 3-5w"></div>
-            <div class="band-pip" style="background:var(--hephaestus)"title="hephaestus · 6-10w"></div>
-            <div class="band-pip" style="background:var(--demeter)"   title="demeter · 11-20w"></div>
-            <div class="band-pip" style="background:var(--poseidon)"  title="poseidon · 21-35w"></div>
-            <div class="band-pip" style="background:var(--athena)"    title="athena · 36-50w"></div>
-            <div class="band-pip" style="background:var(--zeus);box-shadow:0 0 6px rgba(200,168,74,0.55);" title="zeus · 51w+"></div>
-        </div>
-    </div>
 
-    <div class="output-area" id="outputArea">
-        <div class="entry-card system">
-            <div class="entry-meta">◈ initium ◈</div>
-            <div class="entry-body">
-                The Grimoir reads the spectral archive. <span style="color:var(--muted);font-size:0.84rem;">write</span> routes by word count automatically.<br>
-                <span style="color:var(--muted);font-size:0.84rem;">
-                    <span style="color:#d4b96a;">relic</span> ·
-                    <span style="color:#9ab3c9;">harvest</span> ·
-                    <span style="color:#9ab3c9;">find [text]</span> ·
-                    <span style="color:#9ab3c9;">band [name]</span> ·
-                    <span style="color:#9ab3c9;">chain [id]</span> ·
-                    <span style="color:#9ab3c9;">write [text]</span> ·
-                    <span style="color:var(--muted);">help</span>
-                </span>
-            </div>
-        </div>
-    </div>
+<div class="ouroboros" id="ouroboros">
 
-    <div class="bottom-bar">
-        <div class="feedback-row">
-            <span class="sys-feedback" id="sysFeedback">⚙ ready</span>
-        </div>
-        <div class="command-row">
-            <span class="prompt">⟡</span>
-            <input type="text" id="commandInput" placeholder="relic · harvest · find · band · chain · write · help" autofocus>
-            <button class="invoke-btn" id="submitBtn">invoke</button>
-        </div>
+  <!-- ⚓ TOME (Hermes) · Persona Selection -->
+  <section class="god-panel" data-god="tome" id="tome">
+    <div class="telos-bar">⚓ THE TOME · <span id="tome-telos">Harvesting words</span><span class="telos-dot"></span></div>
+    <div class="terminal" id="tome-terminal"><div class="line">⚓ The Tome opens. Choose a persona to begin the tale...</div></div>
+    <div class="persona-grid" id="persona-grid"></div>
+    <div class="variation-row" id="variation-row" style="display:none;"></div>
+    <div class="chord-bar">
+      <span class="chord-slot" id="slot-persona">Persona</span>
+      <span class="chord-arrow">·</span>
+      <span class="chord-slot" id="slot-harmonic">Aspect</span>
     </div>
+    <div class="god-buttons">
+      <button class="god-btn" onclick="tomeClear()">🕯️ Clear</button>
+      <button class="god-btn primary" onclick="tomeSend()">📜 Bind to Binding</button>
+    </div>
+    <div class="queue"><div class="queue-label">📜 Sent Personas</div><div id="tome-queue"></div></div>
+    <div class="output-area" id="tome-output"><div class="output-placeholder">Your chosen soul appears here</div></div>
+  </section>
 
-    <div class="help-overlay" id="helpOverlay">
-        <div class="help-panel">
-            <button class="close-help" id="closeHelp">✕</button>
-            <h3>⟡ Grimoir · Command Reference</h3>
-            <ul>
-                <li><span class="cmd-name">relic</span><span class="cmd-desc">Surface a random entry from the archive.</span></li>
-                <li><span class="cmd-name">harvest</span><span class="cmd-desc">Show the 5 most recent zeus artifacts.</span></li>
-                <li><span class="cmd-name">find [text]</span><span class="cmd-desc">Search across all seven spectral tables. Matches highlighted per band.</span></li>
-                <li><span class="cmd-name">band [name]</span><span class="cmd-desc">Browse a specific spectral level. hermes · apollo · hephaestus · demeter · poseidon · athena · zeus</span></li>
-                <li><span class="cmd-name">chain [id]</span><span class="cmd-desc">Pull a specific entry by id.</span></li>
-                <li>
-                    <span class="cmd-name">write [text]</span>
-                    <span class="cmd-desc">Inscribe text. Automatically routed to the correct band by word count:</span>
-                    <table class="band-table" style="margin-top:0.5rem;">
-                        <tr><td><span class="band-swatch" style="background:var(--hermes)"></span><span style="color:var(--hermes)">hermes</span></td><td style="color:var(--dim)">1-2 words</td></tr>
-                        <tr><td><span class="band-swatch" style="background:var(--apollo)"></span><span style="color:var(--apollo)">apollo</span></td><td style="color:var(--dim)">3-5 words</td></tr>
-                        <tr><td><span class="band-swatch" style="background:var(--hephaestus)"></span><span style="color:var(--hephaestus)">hephaestus</span></td><td style="color:var(--dim)">6-10 words</td></tr>
-                        <tr><td><span class="band-swatch" style="background:var(--demeter)"></span><span style="color:var(--demeter)">demeter</span></td><td style="color:var(--dim)">11-20 words</td></tr>
-                        <tr><td><span class="band-swatch" style="background:var(--poseidon)"></span><span style="color:var(--poseidon)">poseidon</span></td><td style="color:var(--dim)">21-35 words</td></tr>
-                        <tr><td><span class="band-swatch" style="background:var(--athena)"></span><span style="color:var(--athena)">athena</span></td><td style="color:var(--dim)">36-50 words</td></tr>
-                        <tr><td><span class="band-swatch" style="background:var(--zeus);box-shadow:0 0 4px rgba(200,168,74,0.4)"></span><span style="color:var(--zeus)">zeus</span></td><td style="color:var(--dim)">51+ words</td></tr>
-                    </table>
-                </li>
-            </ul>
-        </div>
+  <!-- 🩸 THE BINDING (Aphrodite) · Action/Setting -->
+  <section class="god-panel" data-god="binding" id="binding">
+    <div class="telos-bar">🩸 THE BINDING · <span id="binding-telos">Pairing fates</span><span class="telos-dot"></span></div>
+    <div class="terminal" id="binding-terminal"><div class="line">🩸 The Binding awaits a soul to entwine...</div></div>
+    <div class="god-buttons">
+      <button class="god-btn" onclick="bindingSuggest()">🕯️ Suggest Fates</button>
+      <button class="god-btn primary" onclick="bindingSeal()">🩸 Seal the Pact</button>
     </div>
+    <div class="queue"><div class="queue-label">🩸 Fate Queue</div><div id="binding-queue"></div></div>
+    <div class="output-area" id="binding-output"><div class="output-placeholder">Bound fates appear here</div></div>
+  </section>
+
+  <!-- 🕯️ THE QUILL (Apollo) · Scene & Prompt -->
+  <section class="god-panel" data-god="quill" id="quill">
+    <div class="telos-bar">🕯️ THE QUILL · <span id="quill-telos">Scribing the scene</span><span class="telos-dot"></span></div>
+    <div class="terminal" id="quill-terminal"><div class="line">🕯️ The Quill awaits a sealed pact...</div></div>
+    <div class="god-buttons">
+      <button class="god-btn" onclick="quillAtmosphere()">🌑 Atmosphere</button>
+      <button class="god-btn primary" onclick="quillInscribe()">🕯️ Inscribe Prompt</button>
+    </div>
+    <div class="queue"><div class="queue-label">🕯️ Inscription Queue</div><div id="quill-queue"></div></div>
+    <div class="output-area" id="quill-output"><div class="output-placeholder">Inscriptions appear here</div></div>
+  </section>
+
+  <!-- 🌑 THE INKWELL (Demeter) · Passage Generation -->
+  <section class="god-panel" data-god="inkwell" id="inkwell">
+    <div class="telos-bar">🌑 THE INKWELL · <span id="inkwell-telos">Generating passage</span><span class="telos-dot"></span></div>
+    <div class="terminal" id="inkwell-terminal"><div class="line">🌑 The Inkwell awaits inscription...</div></div>
+    <div class="god-buttons">
+      <button class="god-btn" onclick="inkwellMutate()">🕸️ Twist Thread</button>
+      <button class="god-btn primary" onclick="inkwellWrite()">🌑 Write Passage</button>
+    </div>
+    <div class="queue"><div class="queue-label">🌑 Seed Queue</div><div id="inkwell-queue"></div></div>
+    <div class="output-area" id="inkwell-output">
+      <div class="output-placeholder">Prose flows here</div>
+      <div class="map-container" id="quest-map-container">
+        <svg id="quest-map-svg" viewBox="0 0 600 180"></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🕸️ THE THRESHOLD (Poseidon) · Reflection & Loop -->
+  <section class="god-panel" data-god="threshold" id="threshold">
+    <div class="telos-bar">🕸️ THE THRESHOLD · <span id="threshold-telos">Reflecting</span><span class="telos-dot"></span></div>
+    <div class="terminal" id="threshold-terminal"><div class="line">🕸️ The Threshold awaits the passage...</div></div>
+    <div class="god-buttons">
+      <button class="god-btn" onclick="thresholdTheme()">🕯️ Extract Themes</button>
+      <button class="god-btn primary" onclick="thresholdLoop()">🕸️ Detect Echoes</button>
+    </div>
+    <div class="queue"><div class="queue-label">🕸️ Reflection Queue</div><div id="threshold-queue"></div></div>
+    <div class="output-area" id="threshold-output"><div class="output-placeholder">Themes & echoes appear here</div></div>
+  </section>
+
+  <!-- 🜚 THE PACT (Hera) · Telos & Lineage -->
+  <section class="god-panel" data-god="pact" id="pact">
+    <div class="telos-bar">🜚 THE PACT · <span id="pact-telos">The bargain holds</span><span class="telos-dot"></span></div>
+    <div class="terminal" id="pact-terminal"><div class="line">🜚 The Pact presides. The bargain is struck.</div></div>
+    <div class="god-buttons">
+      <button class="god-btn" onclick="pactSetTelos()">🩸 Set Intention</button>
+      <button class="god-btn primary" onclick="pactLineage()">🕯️ View Lineage</button>
+    </div>
+    <div class="queue"><div class="queue-label">🜚 Pact Queue</div><div id="pact-queue"></div></div>
+    <div class="output-area" id="pact-output"><div class="output-placeholder">The bargain's lineage</div></div>
+  </section>
+
 </div>
 
-<script>
-const SB_URL = 'https://kzcucjcyxybypncbdbws.supabase.co';
-const SB_KEY = 'sb_publishable_saeUHGocDah-T2_709M6Fg_g26JtLXw';
+<div class="nav-hint" id="nav-hint"></div>
 
-const BANDS = [
-    { name:'hermes',     table:'hermes_entries',     color:'#6a7fa0', min:1,  max:2   },
-    { name:'apollo',     table:'apollo_entries',     color:'#7a9e8a', min:3,  max:5   },
-    { name:'hephaestus', table:'hephaestus_entries', color:'#9e8a5a', min:6,  max:10  },
-    { name:'demeter',    table:'demeter_entries',    color:'#8a9e6a', min:11, max:20  },
-    { name:'poseidon',   table:'poseidon_entries',   color:'#5a7a9e', min:21, max:35  },
-    { name:'athena',     table:'athena_entries',     color:'#9e7a9e', min:36, max:50  },
-    { name:'zeus',       table:'zeus_entries',       color:'#c8a84a', min:51, max:Infinity },
+<script type="module">
+// ============================================================
+// GRIMOIR · 12 PERSONAS × 3 HARMONICS
+// ============================================================
+const PERSONAS = [
+  { anchor:'Fyrsthara', emoji:'🐇', harmonics:['The Leaper','The Heartbeat','The Prey'] },
+  { anchor:'Gehaldric', emoji:'👑', harmonics:['The Conqueror','The Seeker','The Wanderer'] },
+  { anchor:'Thyrdeth',  emoji:'🧶', harmonics:['Wyrdeth (Spins)','Wefanta (Measures)','Sceathend (Cuts)'] },
+  { anchor:'The Wolf',  emoji:'🐺', harmonics:['The Pursuer','The Kinsman','The Shadow'] },
+  { anchor:'Charon',    emoji:'⛵', harmonics:['The Carrier','The Witness','The Deceived'] },
+  { anchor:'The Grove', emoji:'🌳', harmonics:['The Sanctuary','The Crime Scene','The Promise'] },
+  { anchor:'Fair Maiden',emoji:'🕊️', harmonics:['The Innocent','The Trapped','The Awakened'] },
+  { anchor:'Woodcutter',emoji:'🪓', harmonics:['The Provider','The Executioner','The Abandoner'] },
+  { anchor:'Sorcerer',  emoji:'🔮', harmonics:['The Caster','The Bargainer','The Undone'] },
+  { anchor:'Beast',     emoji:'🕯️', harmonics:['The Hidden','The Patient','The Revealed'] },
+  { anchor:'Crone',     emoji:'🧹', harmonics:['The Tester','The Rememberer','The Threshold'] },
+  { anchor:'Lampbearer',emoji:'🏮', harmonics:['The Guide','The Trickster','The One Who Steps Back'] }
 ];
-const BAND_BY_NAME = {};
-BANDS.forEach(b => { BAND_BY_NAME[b.name] = b; });
-const BAND_ORDER = BANDS.map(b => b.name);
 
-function bandForWordCount(wc) {
-    return BANDS.find(b => wc >= b.min && wc <= b.max) || BANDS[BANDS.length - 1];
+// ============================================================
+// VERB/SETTING DICTIONARY · Grimoire fates
+// ============================================================
+const FATES = [
+  { verb:'crosses the threshold of', object:'the sacred grove', domain:'Threshold' },
+  { verb:'speaks the true name of', object:'the Wolf', domain:'Naming' },
+  { verb:'steals fire from', object:'the heart of the Hare', domain:'Theft' },
+  { verb:'binds a pact with', object:'the Woman Who Is Three', domain:'Pact' },
+  { verb:'carries the burden of', object:'the unkept promise', domain:'Debt' },
+  { verb:'awakens in the belly of', object:'the great Whale', domain:'Descent' },
+  { verb:'offers bread to', object:'the Hungry Dark', domain:'Sacrifice' },
+  { verb:'cuts the thread between', object:'the shadow and the self', domain:'Severance' },
+  { verb:'remembers the name of', object:'the Forgotten Twin', domain:'Memory' },
+  { verb:'lights a candle at', object:'the edge of the known world', domain:'Hope' },
+  { verb:'flees from the gaze of', object:'the mirror that remembers', domain:'Flight' },
+  { verb:'sits at the table of', object:'the feast that never ends', domain:'Eternity' }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const Grimoir = {
+  activeTelos: null,
+  telosLineage: [],
+  selectedPersona: null,
+  storyHistory: [],
+  currentNodeId: null,
+  nodeCounter: 0,
+  encounterPool: [],
+  gods: {
+    tome:      { queue:[], output:[], terminal:['⚓ The Tome opens...'] },
+    binding:   { queue:[], output:[], terminal:['🩸 The Binding awaits...'] },
+    quill:     { queue:[], output:[], terminal:['🕯️ The Quill awaits...'] },
+    inkwell:   { queue:[], output:[], terminal:['🌑 The Inkwell awaits...'] },
+    threshold: { queue:[], output:[], terminal:['🕸️ The Threshold awaits...'] },
+    pact:      { queue:[], output:[], terminal:['🜚 The Pact presides.'] }
+  }
+};
+
+// Quest Map data
+const QuestMap = { nodes:[], edges:[], currentNodeId:null };
+
+// ============================================================
+// HELPERS
+// ============================================================
+function log(god, msg) {
+  Grimoir.gods[god].terminal.push(msg);
+  if (Grimoir.gods[god].terminal.length > 20) Grimoir.gods[god].terminal.shift();
+  renderTerminal(god);
+}
+function enqueue(god, item) {
+  Grimoir.gods[god].queue.push({...item, status:'ready'});
+  renderQueue(god);
+}
+function dequeue(god) {
+  if (!Grimoir.gods[god].queue.length) return null;
+  Grimoir.gods[god].queue[0].status='processing';
+  renderQueue(god);
+  return Grimoir.gods[god].queue.shift();
+}
+function setOutput(god, html) {
+  document.getElementById(god+'-output').innerHTML = html;
+}
+function renderTerminal(god) {
+  const t = Grimoir.gods[god].terminal;
+  const el = document.getElementById(god+'-terminal');
+  el.innerHTML = t.map((l,i) => `<div class="line${i===t.length-1?' latest':''}">${l}</div>`).join('');
+  el.scrollTop = el.scrollHeight;
+}
+function renderQueue(god) {
+  const q = Grimoir.gods[god].queue;
+  const el = document.getElementById(god+'-queue');
+  if (!q.length) { el.innerHTML='<div class="queue-item"><span class="text" style="color:var(--muted)">— Empty —</span></div>'; return; }
+  el.innerHTML = q.map(i => `<div class="queue-item"><span class="icon">${i.icon||'📦'}</span><span class="text">${i.label||'Item'}</span></div>`).join('');
+}
+function updateAllTelos() {
+  const d = Grimoir.activeTelos || 'The bargain holds';
+  ['tome','binding','quill','inkwell','threshold','pact'].forEach(g => {
+    document.getElementById(g+'-telos').textContent = d;
+  });
 }
 
-const outputDiv    = document.getElementById('outputArea');
-const commandInput = document.getElementById('commandInput');
-const sysFeedback  = document.getElementById('sysFeedback');
-const helpOverlay  = document.getElementById('helpOverlay');
-let   fbTimer      = null;
+// ============================================================
+// QUEST MAP RENDERER
+// ============================================================
+function renderQuestMap() {
+  const svg = document.getElementById('quest-map-svg');
+  const nodes = QuestMap.nodes;
+  if (nodes.length === 0) {
+    svg.innerHTML = '<text x="300" y="90" text-anchor="middle" fill="#3a3a4a" font-size="10">The map awaits the first step...</text>';
+    return;
+  }
 
-// ── Feedback ──────────────────────────────────────────────────────────────────
-function setFeedback(msg, isError=false) {
-    if (fbTimer) clearTimeout(fbTimer);
-    sysFeedback.className = 'sys-feedback' + (isError ? ' error' : '');
-    sysFeedback.textContent = isError ? `⚠ ${msg}` : `✦ ${msg}`;
-    fbTimer = setTimeout(() => {
-        sysFeedback.className = 'sys-feedback';
-        sysFeedback.textContent = '⚙ ready';
-    }, 3500);
-}
-function setLoading(msg) {
-    if (fbTimer) clearTimeout(fbTimer);
-    sysFeedback.className = 'sys-feedback';
-    sysFeedback.innerHTML = `<span class="pulse">◌</span> ${msg}`;
-}
+  // Auto-layout: simple grid spiral
+  const cols = 4;
+  nodes.forEach((n, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    n.x = 80 + col * 140;
+    n.y = 30 + row * 60;
+    if (n.y > 150) n.y = 30 + (row % 3) * 60; // wrap
+  });
 
-// ── Utils ─────────────────────────────────────────────────────────────────────
-function esc(s) {
-    return String(s)
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function highlight(text, term) {
-    if (!term) return esc(text);
-    const e = esc(text);
-    const re = new RegExp(`(${esc(term).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
-    return e.replace(re, '<mark>$1</mark>');
-}
-function fmt(text) {
-    if (!text) return '… empty passage …';
-    if (text.startsWith('Within the Abbey,')) return text;
-    return `Within the Abbey, ${text.charAt(0).toLowerCase() + text.slice(1)}`;
-}
-function fmtDate(ts) {
-    if (!ts) return '—';
-    return new Date(ts).toLocaleString();
-}
-function hexRgb(hex) {
-    return `${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)}`;
-}
-function wordCount(text) {
-    return text.trim().split(/\s+/).filter(Boolean).length;
-}
-function addBanner(text) {
-    const el = document.createElement('div');
-    el.className = 'section-banner';
-    el.textContent = text;
-    outputDiv.appendChild(el);
-}
-function addSystemCard(msg) {
-    const c = document.createElement('div');
-    c.className = 'entry-card system';
-    c.innerHTML = `<div class="entry-meta">◇ system</div><div class="entry-body muted">${esc(msg)}</div>`;
-    outputDiv.appendChild(c);
-    c.scrollIntoView({ behavior:'smooth', block:'nearest' });
-}
-
-// ── API ───────────────────────────────────────────────────────────────────────
-async function sbGet(table, qs='') {
-    const r = await fetch(`${SB_URL}/rest/v1/${table}${qs}`, {
-        headers:{ 'apikey':SB_KEY, 'Authorization':`Bearer ${SB_KEY}` }
-    });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
-}
-async function sbPost(table, body) {
-    const r = await fetch(`${SB_URL}/rest/v1/${table}`, {
-        method:'POST',
-        headers:{ 'apikey':SB_KEY, 'Authorization':`Bearer ${SB_KEY}`, 'Content-Type':'application/json' },
-        body: JSON.stringify(body)
-    });
-    if (!r.ok) { const t=await r.text(); throw new Error(`HTTP ${r.status}: ${t}`); }
-}
-
-// ── Render helpers ────────────────────────────────────────────────────────────
-function renderResultCard(band, entry, delay=0, hlTerm=null) {
-    const w = document.createElement('div');
-    w.className = 'result-wrapper';
-    w.style.animationDelay = `${delay}ms`;
-    w.style.borderColor = `rgba(${hexRgb(band.color)},0.18)`;
-
-    const raw  = entry?.body || '';
-    const wc   = entry?.word_count || wordCount(raw);
-    const body = hlTerm ? highlight(fmt(raw), hlTerm) : esc(fmt(raw));
-
-    w.innerHTML = `
-        <div class="result-header" style="background:rgba(${hexRgb(band.color)},0.06);border-bottom:1px solid rgba(${hexRgb(band.color)},0.1);">
-            <span class="result-band-name" style="color:${band.color};">
-                <span style="width:6px;height:6px;border-radius:50%;background:${band.color};display:inline-block;"></span>
-                ${esc(band.name)}
-            </span>
-            <span class="result-date">${fmtDate(entry?.created_at)}</span>
-        </div>
-        <div class="result-body-wrap" style="border-left-color:${band.color};">
-            <div class="result-body">${body}</div>
-            <div class="result-wc">${wc}w</div>
-        </div>
-    `;
-    outputDiv.appendChild(w);
-    w.scrollIntoView({ behavior:'smooth', block:'nearest' });
-}
-
-function renderWriteCard(band, entry) {
-    const raw = entry?.body || '';
-    const wc  = entry?.word_count || wordCount(raw);
-    const w   = document.createElement('div');
-    w.className = 'write-card';
-    w.style.borderLeftColor = band.color;
-    w.innerHTML = `
-        <div class="entry-meta" style="color:${band.color};">
-            ✍ inscribed · <span style="letter-spacing:1px;">${esc(band.name)}</span> · ${fmtDate(new Date().toISOString())}
-        </div>
-        <div class="entry-body">${esc(fmt(raw))}</div>
-        <div style="font-family:monospace;font-size:0.53rem;color:var(--dim);margin-top:0.3rem;">${wc}w</div>
-    `;
-    outputDiv.appendChild(w);
-    w.scrollIntoView({ behavior:'smooth', block:'nearest' });
-}
-
-// ── Commands ──────────────────────────────────────────────────────────────────
-async function onRelic() {
-    setLoading('summoning a relic…');
-    try {
-        // Pick a random band weighted by row count, then pull a random entry
-        const pick = BANDS[Math.floor(Math.random() * BANDS.length)];
-        const data = await sbGet(pick.table, '?select=id,body,word_count,created_at&limit=50');
-        if (!data?.length) {
-            // fallback to zeus
-            const z = await sbGet('zeus_entries', '?select=id,body,word_count,created_at&limit=50');
-            if (!z?.length) { addSystemCard('The archive is silent.'); setFeedback('archive empty'); return; }
-            renderResultCard(BAND_BY_NAME['zeus'], z[Math.floor(Math.random()*z.length)]);
-        } else {
-            renderResultCard(pick, data[Math.floor(Math.random()*data.length)]);
-        }
-        setFeedback(`relic surfaced · ${pick.name}`);
-    } catch(e) { console.error(e); setFeedback('could not reach the archive', true); }
-}
-
-async function onHarvest() {
-    setLoading('harvesting recent artifacts…');
-    try {
-        const data = await sbGet('zeus_entries', '?select=id,body,word_count,created_at&order=created_at.desc&limit=5');
-        if (!data?.length) { addSystemCard('Nothing to harvest yet.'); setFeedback('archive empty'); return; }
-        addBanner(`⚱ harvest — ${data.length} most recent zeus artifact${data.length!==1?'s':''}`);
-        data.forEach((entry,i) => renderResultCard(BAND_BY_NAME['zeus'], entry, i*80));
-        setFeedback(`${data.length} artifact${data.length!==1?'s':''} harvested`);
-    } catch(e) { console.error(e); setFeedback('harvest failed', true); }
-}
-
-async function onFind(term) {
-    if (!term?.trim()) { setFeedback('find what?', true); return; }
-    const t = term.trim();
-    setLoading(`searching all bands for "${t}"…`);
-    try {
-        const enc = encodeURIComponent(`%${t}%`);
-        const allResults = [];
-        await Promise.all(BANDS.map(async band => {
-            try {
-                const data = await sbGet(band.table,
-                    `?select=id,body,word_count,created_at&body=ilike.${enc}&order=created_at.desc&limit=10`
-                );
-                if (data?.length) data.forEach(entry => allResults.push({band, entry}));
-            } catch(_) {}
-        }));
-
-        if (!allResults.length) {
-            addSystemCard(`No passages found containing "${t}".`);
-            setFeedback(`no matches for "${t}"`);
-            return;
-        }
-
-        allResults.sort((a,b) => {
-            const oi = BAND_ORDER.indexOf(a.band.name) - BAND_ORDER.indexOf(b.band.name);
-            return oi !== 0 ? oi : new Date(b.entry.created_at) - new Date(a.entry.created_at);
-        });
-
-        const bandSet = new Set(allResults.map(r=>r.band.name));
-        addBanner(`🔍 find: "${t}" — ${allResults.length} passage${allResults.length!==1?'s':''} across ${bandSet.size} band${bandSet.size!==1?'s':''}`);
-        allResults.forEach(({band,entry},i) => renderResultCard(band, entry, i*45, t));
-        setFeedback(`${allResults.length} passage${allResults.length!==1?'s':''} found`);
-    } catch(e) { console.error(e); setFeedback('search failed', true); }
-}
-
-async function onBand(bandName) {
-    const b = BAND_BY_NAME[bandName?.toLowerCase()?.trim()];
-    if (!b) { setFeedback('unknown band · hermes apollo hephaestus demeter poseidon athena zeus', true); return; }
-    setLoading(`reading ${b.name}…`);
-    try {
-        const data = await sbGet(b.table, '?select=id,body,word_count,created_at&order=created_at.desc&limit=10');
-        if (!data?.length) { addSystemCard(`${b.name} is silent.`); setFeedback(`${b.name} has no entries`); return; }
-        addBanner(`◈ ${b.name} — ${data.length} passage${data.length!==1?'s':''}`);
-        data.forEach((entry,i) => renderResultCard(b, entry, i*50));
-        setFeedback(`${b.name} · ${data.length} entries`);
-    } catch(e) { console.error(e); setFeedback(`could not read ${b.name}`, true); }
-}
-
-async function onChain(id) {
-    if (!id?.trim()) { setFeedback('chain [id] required', true); return; }
-    const trimId = id.trim();
-    setLoading(`retrieving ${trimId.slice(0,8)}…`);
-    try {
-        // Search all bands for this id
-        let found = null;
-        let foundBand = null;
-        for (const band of BANDS) {
-            try {
-                const d = await sbGet(band.table, `?select=id,body,word_count,created_at&id=eq.${encodeURIComponent(trimId)}&limit=1`);
-                if (d?.length) { found = d[0]; foundBand = band; break; }
-            } catch(_) {}
-        }
-        if (!found) { addSystemCard(`No entry found for id: ${trimId}`); setFeedback('not found', true); return; }
-        renderResultCard(foundBand, found);
-        setFeedback(`entry retrieved · ${foundBand.name}`);
-    } catch(e) { console.error(e); setFeedback('retrieval failed', true); }
-}
-
-async function onWrite(text) {
-    if (!text?.trim()) { setFeedback('write what?', true); return; }
-    const trimmed = text.trim();
-    const wc      = wordCount(trimmed);
-    const band    = bandForWordCount(wc);
-
-    setLoading(`routing to ${band.name}…`);
-
-    const firstWords = trimmed.split(/\s+/).slice(0,3).join('_');
-    const label = `grimoir_${firstWords}_${Date.now()}`;
-
-    try {
-        await sbPost(band.table, {
-            label,
-            body: trimmed,
-            word_count: wc,
-            created_at: new Date().toISOString()
-        });
-        renderWriteCard(band, { body: trimmed, word_count: wc });
-        setFeedback(`✧ inscribed · ${band.name} · ${wc}w`);
-    } catch(e) {
-        console.error(e);
-        // If constraint violation, tell the user clearly
-        if (e.message.includes('violates check constraint')) {
-            setFeedback(`word count ${wc} rejected by ${band.name} constraint`, true);
-        } else {
-            setFeedback(`could not inscribe: ${e.message.slice(0,60)}`, true);
-        }
+  let html = '';
+  // Edges
+  QuestMap.edges.forEach(e => {
+    const from = nodes.find(n => n.id === e.from);
+    const to = nodes.find(n => n.id === e.to);
+    if (from && to) {
+      const isLoop = e.loop;
+      html += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" 
+                stroke="${isLoop ? '#c9a050' : '#3a3a4a'}" stroke-width="${isLoop ? 2 : 1}" 
+                stroke-dasharray="${isLoop ? '4,2' : 'none'}" opacity="0.7"/>`;
     }
+  });
+  // Nodes
+  nodes.forEach(n => {
+    const isCurrent = n.id === QuestMap.currentNodeId;
+    const r = isCurrent ? 14 : 10;
+    html += `<circle cx="${n.x}" cy="${n.y}" r="${r}" fill="${isCurrent ? '#8b3a3a' : '#1a1520'}" 
+              stroke="${isCurrent ? '#c9a050' : '#3a3a4a'}" stroke-width="${isCurrent ? 2 : 1}"/>`;
+    html += `<text x="${n.x}" y="${n.y - r - 4}" class="map-label${isCurrent ? ' current' : ''}">${n.label}</text>`;
+    html += `<text x="${n.x}" y="${n.y + 3}" text-anchor="middle" fill="#6b6b7b" font-size="5">${n.emoji}</text>`;
+  });
+
+  svg.innerHTML = html;
 }
 
-// ── Dispatch ──────────────────────────────────────────────────────────────────
-async function dispatch(raw) {
-    const cmd  = raw.trim();
-    const lower = cmd.toLowerCase();
-    const parts = cmd.split(/\s+/);
-    const verb  = parts[0].toLowerCase();
-
-    if (lower==='relic')   return onRelic();
-    if (lower==='harvest') return onHarvest();
-    if (lower==='help')    { helpOverlay.classList.add('visible'); return; }
-    if (verb==='find')     return onFind(parts.slice(1).join(' '));
-    if (verb==='band')     return onBand(parts[1]);
-    if (verb==='chain')    return onChain(parts.slice(1).join(' '));
-    if (verb==='write')    return onWrite(parts.slice(1).join(' '));
-    setFeedback(`unknown: "${cmd}" · type help`, true);
+function addQuestNode(step) {
+  Grimoir.nodeCounter++;
+  const id = 'n' + Grimoir.nodeCounter;
+  let label = step.persona?.anchor || 'Unknown';
+  if (label.length > 10) label = label.substring(0, 9) + '…';
+  QuestMap.nodes.push({
+    id, label, emoji: step.persona?.emoji || '📜',
+    passage: step.passage?.substring(0, 60) || '',
+    x: 0, y: 0
+  });
+  if (QuestMap.currentNodeId) {
+    QuestMap.edges.push({ from: QuestMap.currentNodeId, to: id, choice: step.choice || '', loop: false });
+  }
+  QuestMap.currentNodeId = id;
+  renderQuestMap();
 }
 
-// ── Boot ──────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('submitBtn').addEventListener('click', async () => {
-        const v = commandInput.value.trim();
-        if (v) await dispatch(v);
-        commandInput.value = '';
-        commandInput.focus();
+function detectOuroborosLoop(latestPassage) {
+  if (QuestMap.nodes.length < 3) return null;
+  // Simplified loop detection: check if any previous node's label matches the latest
+  const latestLabel = QuestMap.nodes[QuestMap.nodes.length - 1]?.label;
+  const match = QuestMap.nodes.slice(0, -1).find(n => n.label === latestLabel);
+  if (match) return match;
+  // Also check passage similarity (crude: first 20 chars)
+  const first20 = latestPassage?.substring(0, 20);
+  const passageMatch = QuestMap.nodes.slice(0, -1).find(n => n.passage?.substring(0, 20) === first20);
+  if (passageMatch) return passageMatch;
+  return null;
+}
+
+// ============================================================
+// ENCOUNTER POOL
+// ============================================================
+function initEncounterPool() {
+  // All personas except the one currently selected
+  const current = Grimoir.selectedPersona?.personaIndex;
+  Grimoir.encounterPool = PERSONAS.map((p, i) => i).filter(i => i !== current);
+}
+function getUnmetEncounter() {
+  if (Grimoir.encounterPool.length === 0) return null;
+  const idx = Math.floor(Math.random() * Grimoir.encounterPool.length);
+  const personaIdx = Grimoir.encounterPool.splice(idx, 1)[0];
+  return PERSONAS[personaIdx];
+}
+
+// ============================================================
+// TRANSFORMERS.JS SETUP (Lazy-loaded)
+// ============================================================
+let generator = null;
+async function loadGenerator() {
+  if (generator) return generator;
+  log('inkwell', '🌑 Loading the quill (Transformers.js)...');
+  
+  // Dynamic import — only runs in browser
+  const { pipeline } = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1/dist/transformers.min.js');
+  
+  log('inkwell', '🌑 Sharpening the nib...');
+  generator = await pipeline('text-generation', 'Xenova/distilgpt2', {
+    quantized: true
+  });
+  log('inkwell', '🌑 The quill is ready.');
+  return generator;
+}
+
+async function generatePassage(prompt) {
+  const gen = await loadGenerator();
+  log('inkwell', '🌑 Writing passage...');
+  
+  const fullPrompt = `You are a dark fantasy storyteller in the style of old fairy tales and fables. Write in a gothic, literary voice. Use short, rhythmic sentences. The tone is haunting, beautiful, and strange.
+
+${prompt}
+
+Passage (3-5 sentences, ending with exactly 3 choices starting with "→"):`;
+
+  try {
+    const result = await gen(fullPrompt, {
+      max_new_tokens: 200,
+      temperature: 0.85,
+      do_sample: true,
+      top_k: 50,
+      top_p: 0.9
     });
-    commandInput.addEventListener('keypress', async e => {
-        if (e.key==='Enter') {
-            e.preventDefault();
-            const v = commandInput.value.trim();
-            if (v) await dispatch(v);
-            commandInput.value = '';
-        }
-    });
-    document.getElementById('closeHelp').addEventListener('click', () => {
-        helpOverlay.classList.remove('visible'); commandInput.focus();
-    });
-    helpOverlay.addEventListener('click', e => {
-        if (e.target===helpOverlay) { helpOverlay.classList.remove('visible'); commandInput.focus(); }
-    });
-    document.addEventListener('keydown', e => {
-        if (e.key==='Escape' && helpOverlay.classList.contains('visible')) {
-            helpOverlay.classList.remove('visible'); commandInput.focus();
-        }
-    });
-    setFeedback('grimoir ready · all seven bands active');
-    commandInput.focus();
+    
+    const generated = result[0]?.generated_text || '';
+    // Extract just the new part after the prompt
+    const newText = generated.replace(fullPrompt, '').trim();
+    return newText;
+  } catch (e) {
+    log('inkwell', `⚠️ Quill slipped: ${e.message}`);
+    // Fallback: static passage
+    return generateFallbackPassage();
+  }
+}
+
+function generateFallbackPassage() {
+  const persona = PERSONAS[Grimoir.selectedPersona?.personaIndex || 0];
+  const harmonic = persona.harmonics[Grimoir.selectedPersona?.variationIndex || 0];
+  const fate = FATES[Math.floor(Math.random() * FATES.length)];
+  
+  const passages = [
+    `${harmonic} ${persona.anchor} ${fate.verb} ${fate.object}. The air grew still, as if the world itself held its breath, waiting to see what would happen next. Something old stirred in the dark between the trees — something that had been waiting for exactly this moment.`,
+    
+    `At the edge of the ${fate.domain.toLowerCase()}, ${harmonic} ${persona.anchor} paused. ${fate.verb} ${fate.object} was no small thing. The ground beneath their feet remembered every step that had ever been taken here, and it whispered warnings in a language older than words.`,
+    
+    `${harmonic} ${persona.anchor} ${fate.verb} ${fate.object}, not knowing that this single act would ripple outward through the weave of all things. Thyrdeth, watching from her grove, felt the thread tremble. Somewhere in the deep wood, the Wolf raised its head.`
+  ];
+  
+  const passage = passages[Math.floor(Math.random() * passages.length)];
+  
+  const choices = [
+    `→ Follow the thread deeper into the ${fate.domain.toLowerCase()}`,
+    `→ Turn back while the path still remembers you`,
+    `→ Call out to whatever is watching from the dark`
+  ];
+  
+  return { passage, choices };
+}
+
+function parseGeneratedOutput(text) {
+  if (!text) return generateFallbackPassage();
+  
+  // Split into passage and choices
+  const lines = text.split('\n').filter(l => l.trim());
+  const choiceLines = lines.filter(l => l.trim().startsWith('→') || l.trim().startsWith('-'));
+  const passageLines = lines.filter(l => !choiceLines.includes(l));
+  
+  let passage = passageLines.join(' ').trim();
+  let choices = choiceLines.map(l => l.replace(/^[→\-]\s*/, '').trim()).filter(c => c.length > 0);
+  
+  // If no choices parsed, generate defaults
+  if (choices.length < 3) {
+    const fallback = generateFallbackPassage();
+    choices = fallback.choices;
+    if (!passage) passage = fallback.passage;
+  }
+  
+  // Ensure exactly 3 choices
+  choices = choices.slice(0, 3);
+  while (choices.length < 3) {
+    choices.push(`→ Continue deeper into the tale`);
+  }
+  
+  return { passage: passage || text.substring(0, 200), choices };
+}
+
+// ============================================================
+// TOME · Hermes (Persona Selection)
+// ============================================================
+function renderPersonaGrid() {
+  const grid = document.getElementById('persona-grid');
+  grid.innerHTML = PERSONAS.map((p, i) => {
+    const sel = Grimoir.selectedPersona?.personaIndex === i;
+    return `<div class="persona-card${sel ? ' selected' : ''}" onclick="selectPersona(${i})">
+      <span class="emoji">${p.emoji}</span><span class="name">${p.anchor}</span></div>`;
+  }).join('');
+}
+
+function selectPersona(index) {
+  Grimoir.selectedPersona = { personaIndex: index, variationIndex: null };
+  const p = PERSONAS[index];
+  const row = document.getElementById('variation-row');
+  row.style.display = 'flex';
+  row.innerHTML = p.harmonics.map((h, vi) => 
+    `<div class="variation-chip" onclick="selectVariation(${vi})">${h}</div>`
+  ).join('');
+  document.getElementById('slot-persona').textContent = p.emoji + ' ' + p.anchor;
+  document.getElementById('slot-persona').className = 'chord-slot filled';
+  document.getElementById('slot-harmonic').textContent = 'Aspect';
+  document.getElementById('slot-harmonic').className = 'chord-slot';
+  log('tome', `📜 ${p.emoji} ${p.anchor} chosen. Select an aspect.`);
+  renderPersonaGrid();
+}
+
+function selectVariation(vi) {
+  if (!Grimoir.selectedPersona) return;
+  Grimoir.selectedPersona.variationIndex = vi;
+  const p = PERSONAS[Grimoir.selectedPersona.personaIndex];
+  document.getElementById('slot-harmonic').textContent = p.harmonics[vi];
+  document.getElementById('slot-harmonic').className = 'chord-slot filled';
+  document.querySelectorAll('#variation-row .variation-chip').forEach((c, i) => 
+    c.className = `variation-chip${i === vi ? ' chosen' : ''}`
+  );
+  log('tome', `✅ ${p.harmonics[vi]} ${p.anchor} stands at the threshold.`);
+}
+
+function tomeClear() {
+  Grimoir.selectedPersona = null;
+  document.getElementById('variation-row').style.display = 'none';
+  document.getElementById('slot-persona').textContent = 'Persona';
+  document.getElementById('slot-persona').className = 'chord-slot';
+  document.getElementById('slot-harmonic').textContent = 'Aspect';
+  document.getElementById('slot-harmonic').className = 'chord-slot';
+  renderPersonaGrid();
+  log('tome', '🕯️ Cleared.');
+}
+
+function tomeSend() {
+  if (!Grimoir.selectedPersona || Grimoir.selectedPersona.variationIndex === null) {
+    log('tome', '⚠️ Choose a persona AND an aspect.');
+    return;
+  }
+  const p = PERSONAS[Grimoir.selectedPersona.personaIndex];
+  const h = p.harmonics[Grimoir.selectedPersona.variationIndex];
+  const label = `${h} ${p.anchor}`;
+  log('tome', `📜 Sending: ${label}`);
+  enqueue('tome', { icon: '📜', label });
+  setOutput('tome', `<div style="text-align:center;font-size:0.9rem;color:var(--gold);">📜 ${label}</div>`);
+  
+  // Send to Binding
+  enqueue('binding', { icon: '🩸', label, personaIndex: Grimoir.selectedPersona.personaIndex, harmonic: h });
+  log('binding', `🩸 Received soul: "${label}" — ready for fate binding.`);
+}
+
+// ============================================================
+// BINDING · Aphrodite (Fate Selection)
+// ============================================================
+let bindingSuggestions = [];
+function bindingSuggest() {
+  if (!Grimoir.gods.binding.queue.length) {
+    log('binding', '⚠️ No soul to bind. The Tome must send first.');
+    return;
+  }
+  const shuffled = [...FATES].sort(() => Math.random() - 0.5);
+  bindingSuggestions = shuffled.slice(0, 3);
+  log('binding', `🩸 Fates offered: ${bindingSuggestions.map(s => s.verb + ' ' + s.object).join(' | ')}`);
+  setOutput('binding', 
+    `<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;">` +
+    bindingSuggestions.map((s, i) => 
+      `<div style="padding:8px;background:#1a1520;border-radius:6px;font-size:0.6rem;cursor:pointer;border:1px solid #2a1a1a;" onclick="bindingPick(${i})">
+        🩸 ${s.verb} ${s.object}<br><span style="color:var(--muted)">[${s.domain}]</span></div>`
+    ).join('') + `</div>`
+  );
+}
+function bindingPick(index) {
+  const s = bindingSuggestions[index];
+  const item = Grimoir.gods.binding.queue[0];
+  const pair = { persona: item.label, verb: s.verb, object: s.object, domain: s.domain };
+  log('binding', `🩸 Pact sealed: ${pair.persona} ${pair.verb} ${pair.object} [${pair.domain}]`);
+  Grimoir.gods.binding.output.push(pair);
+  setOutput('binding', 
+    `<div style="text-align:center;padding:10px;background:#1a1520;border:1px solid var(--blood);border-radius:8px;">
+      🩸 <b>${pair.persona}</b><br>${pair.verb} ${pair.object}<br><span style="color:var(--muted)">${pair.domain}</span></div>`
+  );
+  dequeue('binding');
+  // Push to Quill
+  enqueue('quill', { icon: '🕯️', label: `${pair.persona} ${pair.verb} ${pair.object}`, pair });
+  log('quill', `🕯️ Received sealed pact from Binding.`);
+}
+function bindingSeal() {
+  if (!Grimoir.gods.binding.queue.length) {
+    log('binding', '⚠️ Nothing to seal.');
+    return;
+  }
+  if (!bindingSuggestions.length) {
+    log('binding', '⚠️ Tap "Suggest Fates" first.');
+    return;
+  }
+  bindingPick(0);
+}
+
+// ============================================================
+// QUILL · Apollo (Atmosphere + Prompt)
+// ============================================================
+function quillAtmosphere() {
+  const atmospheres = [
+    'gothic, candlelit, dust motes floating in still air',
+    'deep forest, moss-covered stones, the scent of old rain',
+    'twilight at the edge of the world, where the sea meets something older',
+    'inside a dream that is beginning to remember it is a dream'
+  ];
+  Grimoir.gods.quill._atmosphere = atmospheres[Math.floor(Math.random() * atmospheres.length)];
+  log('quill', `🌑 Atmosphere: ${Grimoir.gods.quill._atmosphere}`);
+}
+function quillInscribe() {
+  const item = dequeue('quill');
+  if (!item) { log('quill', '⚠️ No pact to inscribe.'); return; }
+  if (!Grimoir.gods.quill._atmosphere) quillAtmosphere();
+  const prompt = `${item.pair.persona} ${item.pair.verb} ${item.pair.object}. ${Grimoir.gods.quill._atmosphere}.`;
+  log('quill', `🕯️ Inscription: "${prompt.substring(0, 80)}..."`);
+  Grimoir.gods.quill.output.push(prompt);
+  setOutput('quill', 
+    `<div style="padding:10px;background:#1a1520;border:1px solid var(--gold);border-radius:8px;font-size:0.65rem;font-style:italic;">
+      🕯️ ${prompt}</div>`
+  );
+  // Push to Inkwell
+  enqueue('inkwell', { icon: '🌑', label: prompt, prompt, pair: item.pair });
+  log('inkwell', `🌑 Seed received from Quill.`);
+}
+
+// ============================================================
+// INKWELL · Demeter (Passage Generation + Quest Map)
+// ============================================================
+function inkwellMutate() {
+  if (!Grimoir.gods.inkwell.queue.length) {
+    log('inkwell', '⚠️ No seeds to twist.');
+    return;
+  }
+  const item = Grimoir.gods.inkwell.queue[0];
+  const mutations = [
+    item.prompt.replace('meets', 'confronts in the darkness'),
+    item.prompt + ', where an old wound still bleeds',
+    item.prompt.replace('crosses', 'flees across'),
+    item.prompt + ', and the stars above are not their own'
+  ];
+  item.prompt = mutations[Math.floor(Math.random() * mutations.length)];
+  item.label = item.prompt;
+  log('inkwell', `🕸️ Thread twisted: "${item.prompt.substring(0, 60)}..."`);
+  renderQueue('inkwell');
+}
+
+async function inkwellWrite() {
+  const item = dequeue('inkwell');
+  if (!item) { log('inkwell', '⚠️ No seeds.'); return; }
+  
+  // Show loading
+  setOutput('inkwell', `<div style="text-align:center;color:var(--muted);font-size:0.7rem;font-style:italic;padding:20px;">
+    🌑 The ink stirs...<br><span style="font-size:0.55rem;">${item.prompt.substring(0, 60)}...</span></div>`);
+  
+  let result;
+  try {
+    const raw = await generatePassage(item.prompt);
+    result = parseGeneratedOutput(raw);
+  } catch (e) {
+    result = generateFallbackPassage();
+  }
+  
+  const { passage, choices } = result;
+  
+  // Add to story history
+  const step = {
+    persona: PERSONAS[Grimoir.selectedPersona?.personaIndex || 0],
+    harmonic: Grimoir.selectedPersona?.variationIndex !== null ? 
+      PERSONAS[Grimoir.selectedPersona.personaIndex].harmonics[Grimoir.selectedPersona.variationIndex] : '',
+    fate: item.pair,
+    passage,
+    choices
+  };
+  Grimoir.storyHistory.push(step);
+  
+  // Add to quest map
+  addQuestNode(step);
+  
+  // Check for loop
+  const loop = detectOuroborosLoop(passage);
+  if (loop && Grimoir.storyHistory.length >= 3) {
+    log('threshold', '🕸️ An echo detected — the story folds back on itself.');
+    choices.push('🕸️ Step through the threshold (the story remembers you)');
+    // Mark the edge as loop
+    const lastEdge = QuestMap.edges[QuestMap.edges.length - 1];
+    if (lastEdge) lastEdge.loop = true;
+    renderQuestMap();
+  }
+  
+  // Check encounter pool
+  if (Grimoir.storyHistory.length >= 3 && Math.random() < 0.4) {
+    const stranger = getUnmetEncounter();
+    if (stranger) {
+      choices.push(`👤 A stranger approaches: ${stranger.emoji} ${stranger.anchor}`);
+      log('inkwell', `👤 Stranger on the path: ${stranger.anchor}`);
+    }
+  }
+  
+  // Render passage + choices
+  let html = `<div class="passage">${passage}</div>`;
+  choices.forEach((c, i) => {
+    html += `<button class="choice-btn" onclick="inkwellChoose(${i})">${c}</button>`;
+  });
+  setOutput('inkwell', html);
+  
+  log('inkwell', `🌑 Passage written. ${choices.length} paths offered.`);
+  
+  // Push to Threshold
+  enqueue('threshold', { icon: '🕸️', label: passage.substring(0, 60) + '…', passage });
+  log('threshold', '🕸️ Passage received for reflection.');
+}
+
+function inkwellChoose(choiceIndex) {
+  const lastStep = Grimoir.storyHistory[Grimoir.storyHistory.length - 1];
+  if (!lastStep) return;
+  
+  const choice = lastStep.choices[choiceIndex];
+  log('inkwell', `🕯️ Chosen: "${choice}"`);
+  
+  // Push back to Tome as token for next cycle
+  enqueue('tome', { icon: '📜', label: choice });
+  log('tome', `📜 New thread received: "${choice.substring(0, 40)}..."`);
+  
+  // Clear output and show continuation prompt
+  setOutput('inkwell', `<div style="text-align:center;color:var(--gold);font-size:0.7rem;padding:20px;">
+    🕯️ The thread is chosen.<br><span style="color:var(--muted);">Return to the Tome to continue weaving...</span></div>`);
+  
+  // Update quest map to highlight this node
+  renderQuestMap();
+}
+
+// ============================================================
+// THRESHOLD · Poseidon (Theme Extraction)
+// ============================================================
+function thresholdTheme() {
+  if (!Grimoir.storyHistory.length) {
+    log('threshold', '🕸️ No passages to reflect upon.');
+    return;
+  }
+  const themes = ['sacrifice','transformation','memory','hunger','flight','debt','pact','threshold','shadow','return'];
+  const picked = themes.slice(0, 3).sort(() => Math.random() - 0.5);
+  log('threshold', `🕯️ Themes: ${picked.join(', ')}`);
+  setOutput('threshold', 
+    `<div style="padding:10px;font-size:0.65rem;font-style:italic;color:var(--muted);text-align:center;">
+      🕯️ The weave reveals: <b style="color:var(--blood);">${picked.join(' · ')}</b></div>`
+  );
+}
+
+function thresholdLoop() {
+  const loop = detectOuroborosLoop(
+    Grimoir.storyHistory[Grimoir.storyHistory.length - 1]?.passage || ''
+  );
+  if (loop) {
+    log('threshold', `🕸️ Ouroboros turns. The story echoes: "${loop.label}"`);
+    setOutput('threshold', 
+      `<div style="padding:10px;font-size:0.65rem;text-align:center;color:var(--gold);">
+        🕸️ The serpent finds its tail.<br>The story remembers <b>${loop.label}</b>.</div>`
+    );
+  } else {
+    log('threshold', '🕸️ No echoes yet. The thread is still new.');
+    setOutput('threshold', '<div class="output-placeholder">No echoes detected yet.</div>');
+  }
+}
+
+// ============================================================
+// PACT · Hera (Telos & Lineage)
+// ============================================================
+function pactSetTelos() {
+  const telos = prompt('🩸 Set the creative intention for this tale:', Grimoir.activeTelos || '');
+  if (!telos) return;
+  Grimoir.activeTelos = telos;
+  Grimoir.telosLineage.push({ telos, timestamp: new Date().toISOString() });
+  updateAllTelos();
+  log('pact', `🩸 Intention set: "${telos}"`);
+  ['tome','binding','quill','inkwell','threshold'].forEach(g => 
+    log(g, `🩸 Intention received: "${telos}"`)
+  );
+  enqueue('pact', { icon: '🩸', label: telos });
+}
+function pactLineage() {
+  if (!Grimoir.telosLineage.length) {
+    setOutput('pact', '<div class="output-placeholder">No intentions yet recorded.</div>');
+    return;
+  }
+  setOutput('pact', Grimoir.telosLineage.map((t, i) => 
+    `<div style="padding:4px;font-size:0.6rem;font-style:italic;">🕯️ ${t.telos}</div>`
+  ).join(''));
+}
+
+// ============================================================
+// SWIPE NAVIGATION
+// ============================================================
+let currentGodIndex = 0;
+const godOrder = ['tome','binding','quill','inkwell','threshold','pact'];
+const ouroboros = document.getElementById('ouroboros');
+ouroboros.addEventListener('scroll', () => {
+  const idx = Math.round(ouroboros.scrollLeft / window.innerWidth);
+  if (idx !== currentGodIndex && idx >= 0 && idx < godOrder.length) {
+    currentGodIndex = idx;
+    updateNavHint();
+  }
 });
+function updateNavHint() {
+  const icons = ['⚓','🩸','🕯️','🌑','🕸️','🜚'];
+  document.getElementById('nav-hint').innerHTML = godOrder.map((g, i) => 
+    `<span class="${i === currentGodIndex ? 'active' : ''}">${icons[i]}</span>`
+  ).join(' · ');
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' && currentGodIndex < godOrder.length - 1) {
+    e.preventDefault();
+    ouroboros.scrollTo({ left: (currentGodIndex + 1) * window.innerWidth, behavior: 'smooth' });
+  }
+  if (e.key === 'ArrowLeft' && currentGodIndex > 0) {
+    e.preventDefault();
+    ouroboros.scrollTo({ left: (currentGodIndex - 1) * window.innerWidth, behavior: 'smooth' });
+  }
+});
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  renderPersonaGrid();
+  updateAllTelos();
+  updateNavHint();
+  renderQuestMap();
+  initEncounterPool();
+  log('pact', '🜚 Grimoir awakens. The bargain is struck. Swipe between the six rites.');
+  log('tome', '⚓ The Tome opens. Choose a persona to begin.');
+}
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
