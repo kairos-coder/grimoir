@@ -2,947 +2,559 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GRIMOIR · The Faustian Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌿 The Recursive Grimoire · Eternal Branching Deck</title>
 <style>
-  :root {
-    --bg: #0d0d12;
-    --panel: #13131c;
-    --text: #c8c8d4;
-    --muted: #6b6b7b;
-    --gold: #c9a050;
-    --blood: #8b3a3a;
-    --ink: #3a3a5c;
-    --parchment: #1e1c18;
-    --radius: 10px;
-    --touch: 48px;
-  }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    background: var(--bg); color: var(--text);
-    font-family: 'Georgia', 'Times New Roman', serif;
-    overflow-x: hidden;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none; -webkit-user-select: none;
-  }
+:root {
+  --bg: #0a0a0f;
+  --surface: #141420;
+  --text: #c8c8d4;
+  --accent: #7eb8a0;
+  --accent2: #b87e9e;
+  --accent3: #c8a87e;
+  --glow: rgba(126,184,160,0.3);
+  --font-display: 'Georgia', serif;
+  --font-body: 'Georgia', serif;
+  --font-mono: 'Courier New', monospace;
+  --card-radius: 12px;
+  --card-padding: 1.5rem;
+  --split-ratio: 50fr 50fr;
+  --overlay-opacity: 0.05;
+  --generation: 0;
+  transition: all 0.8s ease;
+}
 
-  /* Scroll-snap container */
-  .ouroboros {
-    display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-    scroll-behavior: smooth; height: 100dvh; width: 100vw;
-  }
-  .ouroboros::-webkit-scrollbar { display:none; }
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-  .god-panel {
-    flex: 0 0 100vw; scroll-snap-align: center;
-    display: flex; flex-direction: column; height: 100dvh;
-    border-right: 1px solid #1e1e2a; background: var(--panel);
-    overflow-y: auto;
-  }
+/* ── Generation Counter ── */
+#genCounter {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  background: var(--surface);
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  border: 1px solid var(--accent);
+  opacity: 0.8;
+  pointer-events: none;
+}
+#genCounter .gen-num { font-size: 1.2rem; font-weight: bold; }
 
-  /* Gothic header */
-  .telos-bar {
-    background: #0a0a0f; border-bottom: 2px solid #2a1a1a;
-    padding: 10px 14px; font-size: 0.7rem; text-transform: uppercase;
-    letter-spacing: 0.12em; color: var(--gold); text-align: center;
-    min-height: 40px; display: flex; align-items: center;
-    justify-content: center; gap: 8px; flex-shrink: 0;
-    position: sticky; top: 0; z-index: 10;
-    font-family: 'Courier New', monospace;
-  }
-  .telos-dot { width:6px; height:6px; background:var(--blood); border-radius:50%; animation:flicker 3s infinite; }
-  @keyframes flicker { 0%,100%{opacity:0.4} 50%{opacity:1} 30%,70%{opacity:0.7} }
+/* ── Branch Forest ── */
+#branchForest {
+  padding: 1rem;
+  min-height: 100vh;
+}
 
-  .terminal {
-    background: #09090f; border-bottom: 1px solid #1e1e2a;
-    padding: 6px 12px; font-size: 0.58rem; color: var(--muted);
-    max-height: 70px; overflow-y: auto; flex-shrink: 0; line-height: 1.4;
-    font-family: 'Courier New', monospace;
-  }
-  .terminal .line { opacity:0.6; }
-  .terminal .line.latest { color:var(--blood); opacity:1; }
+/* ── Branch Container ── */
+.branch-node {
+  margin: 0.5rem 0;
+  animation: branchIn 0.6s ease-out;
+  position: relative;
+}
+@keyframes branchIn {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
 
-  .god-buttons { display:flex; gap:6px; padding:8px 10px; flex-shrink:0; }
-  .god-btn {
-    flex:1; min-height: var(--touch); border:1px solid #2a1a1a;
-    background: #1a1520; color: var(--text); font-family: 'Georgia', serif;
-    font-size: 0.75rem; border-radius: var(--radius); cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 4px;
-    transition: all 0.15s;
-  }
-  .god-btn:active { background:#2a1a25; border-color:var(--blood); }
-  .god-btn.primary { background:#1a1020; border-color:var(--gold); color:var(--gold); }
+/* ── Card ── */
+.grimoire-card {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s ease;
+}
+.grimoire-card::before {
+  content: '';
+  position: absolute;
+  top:0; left:0; right:0; bottom:0;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  opacity: var(--overlay-opacity);
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.grimoire-card:hover {
+  box-shadow: 0 0 20px var(--glow);
+  transform: translateY(-2px);
+}
+.grimoire-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.8rem;
+}
+.grimoire-card .card-number {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--accent);
+  opacity: 0.7;
+}
+.grimoire-card .card-gen {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: var(--accent3);
+  opacity: 0.6;
+}
+.grimoire-card .card-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+}
+.grimoire-card .card-body {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text);
+}
+.grimoire-card .card-tags {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.8rem;
+}
+.grimoire-card .card-tag {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--accent3);
+}
 
-  .queue { flex-shrink:0; padding:0 10px; max-height:80px; overflow-y:auto; }
-  .queue-label {
-    font-size:0.55rem; text-transform:uppercase; letter-spacing:0.1em;
-    color:var(--muted); padding:4px 0; position:sticky; top:0;
-    background:var(--panel); font-family:'Courier New',monospace;
-  }
-  .queue-item {
-    background:#14141e; border:1px solid #1e1e2a; border-radius:4px;
-    padding:4px 6px; margin-bottom:2px; font-size:0.6rem;
-    display:flex; align-items:center; gap:4px;
-  }
-  .queue-item .text { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+/* ── Split Container ── */
+.split-container {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  animation: branchIn 0.6s ease-out;
+}
+.split-container.horizontal { grid-template-columns: var(--split-ratio); }
+.split-container.vertical { grid-template-rows: var(--split-ratio); }
+.split-container.diagonal {
+  grid-template-columns: 1fr 1fr;
+  transform: skewY(-0.5deg);
+}
+.split-container .split-cell {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  min-height: 120px;
+}
 
-  .output-area {
-    flex:1; padding:10px; display:flex; flex-direction:column;
-    align-items:center; justify-content:flex-start; min-height:150px;
-    overflow-y:auto;
-  }
-  .output-placeholder { color:var(--muted); font-size:0.7rem; text-align:center; opacity:0.5; margin-top:40px; }
+/* ── Mutation Indicators ── */
+.mutation-badge {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.45rem;
+  padding: 0.1rem 0.3rem;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  color: var(--accent2);
+  opacity: 0.6;
+}
 
-  /* Passage styling */
-  .passage {
-    font-family: 'Georgia', serif;
-    font-size: 0.8rem;
-    line-height: 1.7;
-    color: #d4d0c8;
-    padding: 16px;
-    background: var(--parchment);
-    border: 1px solid #2a2018;
-    border-radius: 8px;
-    max-width: 600px;
-    margin: 6px 0;
-    text-align: left;
-    font-style: italic;
-  }
-  .choice-btn {
-    display: block;
-    width: 100%;
-    max-width: 600px;
-    padding: 10px 14px;
-    margin: 3px 0;
-    background: #1a1520;
-    border: 1px solid #2a1a1a;
-    border-radius: 6px;
-    color: var(--gold);
-    font-family: 'Georgia', serif;
-    font-size: 0.72rem;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.15s;
-  }
-  .choice-btn:active { background:#2a1a25; border-color:var(--blood); }
+/* ── Scroll Sentinel ── */
+#scrollSentinel {
+  height: 1px;
+  width: 100%;
+}
 
-  /* Quest Map */
-  .map-container {
-    width: 100%;
-    max-width: 600px;
-    height: 180px;
-    background: #0a0a0f;
-    border: 1px solid #1e1e2a;
-    border-radius: 8px;
-    margin: 6px 0;
-    overflow: hidden;
-  }
-  .map-container svg { width:100%; height:100%; }
-  .map-label {
-    font-size: 0.5rem;
-    fill: var(--muted);
-    font-family: 'Courier New', monospace;
-    text-anchor: middle;
-  }
-  .map-label.current { fill: var(--gold); font-weight:bold; }
+/* ── Typography Drift States ── */
+body.drift-serif { --font-body: 'Georgia', serif; --font-display: 'Georgia', serif; }
+body.drift-mono { --font-body: 'Courier New', monospace; --font-display: 'Courier New', monospace; }
+body.drift-sans { --font-body: 'Helvetica', sans-serif; --font-display: 'Helvetica', sans-serif; }
 
-  /* Nav hint */
-  .nav-hint {
-    position:fixed; bottom:6px; left:50%; transform:translateX(-50%);
-    font-size:0.45rem; color:var(--muted); z-index:20; pointer-events:none;
-    display:flex; gap:10px; font-family:'Courier New',monospace;
-  }
-  .nav-hint span { opacity:0.3; }
-  .nav-hint span.active { opacity:1; color:var(--blood); }
-
-  /* Persona grid */
-  .persona-grid {
-    display:grid; grid-template-columns:repeat(2,1fr); gap:5px; padding:8px 10px;
-  }
-  .persona-card {
-    background:#14141e; border:1px solid #1e1e2a; border-radius:8px;
-    padding:8px 4px; text-align:center; cursor:pointer; transition:all 0.15s;
-    font-size:0.6rem;
-  }
-  .persona-card:active { background:#1a1525; border-color:var(--blood); }
-  .persona-card .emoji { font-size:1.3rem; display:block; margin-bottom:2px; }
-  .persona-card.selected { border-color:var(--gold); background:#1a1520; }
-  .variation-row { display:flex; gap:4px; padding:4px 10px; }
-  .variation-chip {
-    flex:1; padding:6px 3px; background:#181825; border:1px solid #1e1e2a;
-    border-radius:6px; text-align:center; font-size:0.6rem; cursor:pointer;
-  }
-  .variation-chip:active { background:#251a25; border-color:var(--blood); }
-  .variation-chip.chosen { border-color:var(--blood); background:#1a1520; color:var(--blood); }
-
-  .chord-bar {
-    display:flex; gap:4px; padding:4px 10px; align-items:center;
-    justify-content:center; font-size:0.6rem; flex-wrap:wrap;
-    font-family:'Courier New',monospace;
-  }
-  .chord-slot {
-    background:#1a1a28; border:1px dashed #2a2a3a; border-radius:6px;
-    padding:6px 8px; text-align:center; font-size:0.55rem; min-width:40px;
-  }
-  .chord-slot.filled { border-color:var(--gold); border-style:solid; }
-  .chord-arrow { color:var(--muted); }
+/* ── Color Mutation States ── */
+body.palette-void { --bg: #050510; --surface: #0d0d20; --accent: #6090b0; --accent2: #b06090; }
+body.palette-ember { --bg: #100a05; --surface: #1a0f08; --accent: #d08040; --accent2: #d04040; }
+body.palette-moss { --bg: #050f08; --surface: #0a1a10; --accent: #60b870; --accent2: #b8a060; }
+body.palette-twilight { --bg: #0a0515; --surface: #150d25; --accent: #9070c8; --accent2: #7090c8; }
 </style>
 </head>
 <body>
 
-<div class="ouroboros" id="ouroboros">
-
-  <!-- ⚓ TOME (Hermes) · Persona Selection -->
-  <section class="god-panel" data-god="tome" id="tome">
-    <div class="telos-bar">⚓ THE TOME · <span id="tome-telos">Harvesting words</span><span class="telos-dot"></span></div>
-    <div class="terminal" id="tome-terminal"><div class="line">⚓ The Tome opens. Choose a persona to begin the tale...</div></div>
-    <div class="persona-grid" id="persona-grid"></div>
-    <div class="variation-row" id="variation-row" style="display:none;"></div>
-    <div class="chord-bar">
-      <span class="chord-slot" id="slot-persona">Persona</span>
-      <span class="chord-arrow">·</span>
-      <span class="chord-slot" id="slot-harmonic">Aspect</span>
-    </div>
-    <div class="god-buttons">
-      <button class="god-btn" onclick="tomeClear()">🕯️ Clear</button>
-      <button class="god-btn primary" onclick="tomeSend()">📜 Bind to Binding</button>
-    </div>
-    <div class="queue"><div class="queue-label">📜 Sent Personas</div><div id="tome-queue"></div></div>
-    <div class="output-area" id="tome-output"><div class="output-placeholder">Your chosen soul appears here</div></div>
-  </section>
-
-  <!-- 🩸 THE BINDING (Aphrodite) · Action/Setting -->
-  <section class="god-panel" data-god="binding" id="binding">
-    <div class="telos-bar">🩸 THE BINDING · <span id="binding-telos">Pairing fates</span><span class="telos-dot"></span></div>
-    <div class="terminal" id="binding-terminal"><div class="line">🩸 The Binding awaits a soul to entwine...</div></div>
-    <div class="god-buttons">
-      <button class="god-btn" onclick="bindingSuggest()">🕯️ Suggest Fates</button>
-      <button class="god-btn primary" onclick="bindingSeal()">🩸 Seal the Pact</button>
-    </div>
-    <div class="queue"><div class="queue-label">🩸 Fate Queue</div><div id="binding-queue"></div></div>
-    <div class="output-area" id="binding-output"><div class="output-placeholder">Bound fates appear here</div></div>
-  </section>
-
-  <!-- 🕯️ THE QUILL (Apollo) · Scene & Prompt -->
-  <section class="god-panel" data-god="quill" id="quill">
-    <div class="telos-bar">🕯️ THE QUILL · <span id="quill-telos">Scribing the scene</span><span class="telos-dot"></span></div>
-    <div class="terminal" id="quill-terminal"><div class="line">🕯️ The Quill awaits a sealed pact...</div></div>
-    <div class="god-buttons">
-      <button class="god-btn" onclick="quillAtmosphere()">🌑 Atmosphere</button>
-      <button class="god-btn primary" onclick="quillInscribe()">🕯️ Inscribe Prompt</button>
-    </div>
-    <div class="queue"><div class="queue-label">🕯️ Inscription Queue</div><div id="quill-queue"></div></div>
-    <div class="output-area" id="quill-output"><div class="output-placeholder">Inscriptions appear here</div></div>
-  </section>
-
-  <!-- 🌑 THE INKWELL (Demeter) · Passage Generation -->
-  <section class="god-panel" data-god="inkwell" id="inkwell">
-    <div class="telos-bar">🌑 THE INKWELL · <span id="inkwell-telos">Generating passage</span><span class="telos-dot"></span></div>
-    <div class="terminal" id="inkwell-terminal"><div class="line">🌑 The Inkwell awaits inscription...</div></div>
-    <div class="god-buttons">
-      <button class="god-btn" onclick="inkwellMutate()">🕸️ Twist Thread</button>
-      <button class="god-btn primary" onclick="inkwellWrite()">🌑 Write Passage</button>
-    </div>
-    <div class="queue"><div class="queue-label">🌑 Seed Queue</div><div id="inkwell-queue"></div></div>
-    <div class="output-area" id="inkwell-output">
-      <div class="output-placeholder">Prose flows here</div>
-      <div class="map-container" id="quest-map-container">
-        <svg id="quest-map-svg" viewBox="0 0 600 180"></svg>
-      </div>
-    </div>
-  </section>
-
-  <!-- 🕸️ THE THRESHOLD (Poseidon) · Reflection & Loop -->
-  <section class="god-panel" data-god="threshold" id="threshold">
-    <div class="telos-bar">🕸️ THE THRESHOLD · <span id="threshold-telos">Reflecting</span><span class="telos-dot"></span></div>
-    <div class="terminal" id="threshold-terminal"><div class="line">🕸️ The Threshold awaits the passage...</div></div>
-    <div class="god-buttons">
-      <button class="god-btn" onclick="thresholdTheme()">🕯️ Extract Themes</button>
-      <button class="god-btn primary" onclick="thresholdLoop()">🕸️ Detect Echoes</button>
-    </div>
-    <div class="queue"><div class="queue-label">🕸️ Reflection Queue</div><div id="threshold-queue"></div></div>
-    <div class="output-area" id="threshold-output"><div class="output-placeholder">Themes & echoes appear here</div></div>
-  </section>
-
-  <!-- 🜚 THE PACT (Hera) · Telos & Lineage -->
-  <section class="god-panel" data-god="pact" id="pact">
-    <div class="telos-bar">🜚 THE PACT · <span id="pact-telos">The bargain holds</span><span class="telos-dot"></span></div>
-    <div class="terminal" id="pact-terminal"><div class="line">🜚 The Pact presides. The bargain is struck.</div></div>
-    <div class="god-buttons">
-      <button class="god-btn" onclick="pactSetTelos()">🩸 Set Intention</button>
-      <button class="god-btn primary" onclick="pactLineage()">🕯️ View Lineage</button>
-    </div>
-    <div class="queue"><div class="queue-label">🜚 Pact Queue</div><div id="pact-queue"></div></div>
-    <div class="output-area" id="pact-output"><div class="output-placeholder">The bargain's lineage</div></div>
-  </section>
-
+<div id="genCounter">
+  🌿 Gen <span class="gen-num" id="genNum">0</span>
 </div>
 
-<div class="nav-hint" id="nav-hint"></div>
+<div id="branchForest"></div>
+<div id="scrollSentinel"></div>
 
 <script type="module">
-// ============================================================
-// GRIMOIR · 12 PERSONAS × 3 HARMONICS
-// ============================================================
-const PERSONAS = [
-  { anchor:'Fyrsthara', emoji:'🐇', harmonics:['The Leaper','The Heartbeat','The Prey'] },
-  { anchor:'Gehaldric', emoji:'👑', harmonics:['The Conqueror','The Seeker','The Wanderer'] },
-  { anchor:'Thyrdeth',  emoji:'🧶', harmonics:['Wyrdeth (Spins)','Wefanta (Measures)','Sceathend (Cuts)'] },
-  { anchor:'The Wolf',  emoji:'🐺', harmonics:['The Pursuer','The Kinsman','The Shadow'] },
-  { anchor:'Charon',    emoji:'⛵', harmonics:['The Carrier','The Witness','The Deceived'] },
-  { anchor:'The Grove', emoji:'🌳', harmonics:['The Sanctuary','The Crime Scene','The Promise'] },
-  { anchor:'Fair Maiden',emoji:'🕊️', harmonics:['The Innocent','The Trapped','The Awakened'] },
-  { anchor:'Woodcutter',emoji:'🪓', harmonics:['The Provider','The Executioner','The Abandoner'] },
-  { anchor:'Sorcerer',  emoji:'🔮', harmonics:['The Caster','The Bargainer','The Undone'] },
-  { anchor:'Beast',     emoji:'🕯️', harmonics:['The Hidden','The Patient','The Revealed'] },
-  { anchor:'Crone',     emoji:'🧹', harmonics:['The Tester','The Rememberer','The Threshold'] },
-  { anchor:'Lampbearer',emoji:'🏮', harmonics:['The Guide','The Trickster','The One Who Steps Back'] }
+// ════════════════════════════════════════════
+// RECURSIVE GRIMOIRE · Eternal Branching Deck
+// ════════════════════════════════════════════
+
+// ── 22-Card Deck ──
+const DECK = [
+  { num: 0,  title: 'The Fool',        tags: ['beginning','innocence','leap'],        body: 'Step off the cliff. The void catches those who trust it.' },
+  { num: 1,  title: 'The Magician',    tags: ['will','manifestation','tools'],        body: 'As above, so below. The will shapes the world through focused intent.' },
+  { num: 2,  title: 'The High Priestess', tags: ['intuition','mystery','veil'],      body: 'Behind the veil lies knowing that words cannot carry.' },
+  { num: 3,  title: 'The Empress',     tags: ['abundance','nature','creation'],       body: 'From fertile darkness, all forms emerge. Nurture what grows.' },
+  { num: 4,  title: 'The Emperor',     tags: ['structure','authority','order'],       body: 'Build the walls that hold the garden. Structure enables freedom.' },
+  { num: 5,  title: 'The Hierophant',  tags: ['tradition','teaching','ritual'],       body: 'The old ways hold keys that the new world has forgotten.' },
+  { num: 6,  title: 'The Lovers',      tags: ['choice','union','harmony'],            body: 'Every choice is a marriage to a path. Choose with open eyes.' },
+  { num: 7,  title: 'The Chariot',     tags: ['willpower','direction','triumph'],     body: 'Harness opposing forces. Drive them toward a single purpose.' },
+  { num: 8,  title: 'Strength',        tags: ['courage','patience','inner-power'],    body: 'Gentle persistence tames the wildest beast within.' },
+  { num: 9,  title: 'The Hermit',      tags: ['solitude','wisdom','inner-light'],     body: 'In silence, the lantern reveals what noise obscured.' },
+  { num: 10, title: 'Wheel of Fortune', tags: ['cycles','destiny','turning-point'],   body: 'What rises must fall. What falls will rise again. Spin with it.' },
+  { num: 11, title: 'Justice',         tags: ['balance','truth','consequence'],       body: 'Every action echoes. The scales remember what the mind forgets.' },
+  { num: 12, title: 'The Hanged One',  tags: ['surrender','perspective','pause'],     body: 'Upside down, the world makes different sense. Let go to see.' },
+  { num: 13, title: 'Death',           tags: ['transformation','ending','rebirth'],   body: 'What dies feeds what is born. The compost nourishes the seed.' },
+  { num: 14, title: 'Temperance',      tags: ['balance','patience','alchemy'],        body: 'Blend fire and water. The middle path brews the strongest medicine.' },
+  { num: 15, title: 'The Devil',       tags: ['shadow','attachment','liberation'],    body: 'Chains are often self-forged. Name the binding to break it.' },
+  { num: 16, title: 'The Tower',       tags: ['upheaval','revelation','collapse'],    body: 'False structures crumble. The lightning reveals what was hidden in the walls.' },
+  { num: 17, title: 'The Star',        tags: ['hope','healing','guidance'],           body: 'After the storm, a single light. Pour your vessel into the stream.' },
+  { num: 18, title: 'The Moon',        tags: ['illusion','dreams','subconscious'],    body: 'Not all paths are straight. The moonlight shows what daylight blinds.' },
+  { num: 19, title: 'The Sun',         tags: ['clarity','vitality','joy'],            body: 'Full illumination. The shadow retreats and warmth fills every corner.' },
+  { num: 20, title: 'Judgement',       tags: ['awakening','reckoning','calling'],     body: 'Hear the call. Rise from the sleep of forgetting into purpose.' },
+  { num: 21, title: 'The World',       tags: ['completion','wholeness','integration'], body: 'The circle closes. All fragments reunite. The dance is complete.' }
 ];
 
-// ============================================================
-// VERB/SETTING DICTIONARY · Grimoire fates
-// ============================================================
-const FATES = [
-  { verb:'crosses the threshold of', object:'the sacred grove', domain:'Threshold' },
-  { verb:'speaks the true name of', object:'the Wolf', domain:'Naming' },
-  { verb:'steals fire from', object:'the heart of the Hare', domain:'Theft' },
-  { verb:'binds a pact with', object:'the Woman Who Is Three', domain:'Pact' },
-  { verb:'carries the burden of', object:'the unkept promise', domain:'Debt' },
-  { verb:'awakens in the belly of', object:'the great Whale', domain:'Descent' },
-  { verb:'offers bread to', object:'the Hungry Dark', domain:'Sacrifice' },
-  { verb:'cuts the thread between', object:'the shadow and the self', domain:'Severance' },
-  { verb:'remembers the name of', object:'the Forgotten Twin', domain:'Memory' },
-  { verb:'lights a candle at', object:'the edge of the known world', domain:'Hope' },
-  { verb:'flees from the gaze of', object:'the mirror that remembers', domain:'Flight' },
-  { verb:'sits at the table of', object:'the feast that never ends', domain:'Eternity' }
+// ── State ──
+let generation = 0;
+let branchCount = 0;
+const MAX_BRANCHES = 50; // Safety limit (can be removed for true infinity)
+
+// ── Mutation Types ──
+const MUTATIONS = [
+  'split_horizontal',
+  'split_vertical',
+  'split_diagonal',
+  'replace_card',
+  'spawn_sibling',
+  'typography_drift',
+  'color_palette_shift',
+  'overlay_shift',
+  'aspect_swap',
+  'font_size_drift'
 ];
 
-// ============================================================
-// STATE
-// ============================================================
-const Grimoir = {
-  activeTelos: null,
-  telosLineage: [],
-  selectedPersona: null,
-  storyHistory: [],
-  currentNodeId: null,
-  nodeCounter: 0,
-  encounterPool: [],
-  gods: {
-    tome:      { queue:[], output:[], terminal:['⚓ The Tome opens...'] },
-    binding:   { queue:[], output:[], terminal:['🩸 The Binding awaits...'] },
-    quill:     { queue:[], output:[], terminal:['🕯️ The Quill awaits...'] },
-    inkwell:   { queue:[], output:[], terminal:['🌑 The Inkwell awaits...'] },
-    threshold: { queue:[], output:[], terminal:['🕸️ The Threshold awaits...'] },
-    pact:      { queue:[], output:[], terminal:['🜚 The Pact presides.'] }
-  }
-};
+// ── Ancestor Memory Stack ──
+const ancestorStack = [];
 
-// Quest Map data
-const QuestMap = { nodes:[], edges:[], currentNodeId:null };
-
-// ============================================================
-// HELPERS
-// ============================================================
-function log(god, msg) {
-  Grimoir.gods[god].terminal.push(msg);
-  if (Grimoir.gods[god].terminal.length > 20) Grimoir.gods[god].terminal.shift();
-  renderTerminal(god);
-}
-function enqueue(god, item) {
-  Grimoir.gods[god].queue.push({...item, status:'ready'});
-  renderQueue(god);
-}
-function dequeue(god) {
-  if (!Grimoir.gods[god].queue.length) return null;
-  Grimoir.gods[god].queue[0].status='processing';
-  renderQueue(god);
-  return Grimoir.gods[god].queue.shift();
-}
-function setOutput(god, html) {
-  document.getElementById(god+'-output').innerHTML = html;
-}
-function renderTerminal(god) {
-  const t = Grimoir.gods[god].terminal;
-  const el = document.getElementById(god+'-terminal');
-  el.innerHTML = t.map((l,i) => `<div class="line${i===t.length-1?' latest':''}">${l}</div>`).join('');
-  el.scrollTop = el.scrollHeight;
-}
-function renderQueue(god) {
-  const q = Grimoir.gods[god].queue;
-  const el = document.getElementById(god+'-queue');
-  if (!q.length) { el.innerHTML='<div class="queue-item"><span class="text" style="color:var(--muted)">— Empty —</span></div>'; return; }
-  el.innerHTML = q.map(i => `<div class="queue-item"><span class="icon">${i.icon||'📦'}</span><span class="text">${i.label||'Item'}</span></div>`).join('');
-}
-function updateAllTelos() {
-  const d = Grimoir.activeTelos || 'The bargain holds';
-  ['tome','binding','quill','inkwell','threshold','pact'].forEach(g => {
-    document.getElementById(g+'-telos').textContent = d;
-  });
+function pushAncestor(data) {
+  ancestorStack.push({ ...data, timestamp: Date.now(), generation });
+  if (ancestorStack.length > 100) ancestorStack.shift();
 }
 
-// ============================================================
-// QUEST MAP RENDERER
-// ============================================================
-function renderQuestMap() {
-  const svg = document.getElementById('quest-map-svg');
-  const nodes = QuestMap.nodes;
-  if (nodes.length === 0) {
-    svg.innerHTML = '<text x="300" y="90" text-anchor="middle" fill="#3a3a4a" font-size="10">The map awaits the first step...</text>';
+// ── Branch Spawner ──
+function spawnBranch(mutationType = null) {
+  if (branchCount >= MAX_BRANCHES) {
+    console.log('🌿 Maximum branches reached. The grimoire rests.');
     return;
   }
+  
+  generation++;
+  branchCount++;
+  
+  // Pick mutation if not specified
+  if (!mutationType) {
+    mutationType = MUTATIONS[Math.floor(Math.random() * MUTATIONS.length)];
+  }
+  
+  console.log(`🌿 Gen ${generation}: ${mutationType}`);
+  
+  const forest = document.getElementById('branchForest');
+  
+  switch (mutationType) {
+    case 'split_horizontal':
+      spawnSplit('horizontal', forest);
+      break;
+    case 'split_vertical':
+      spawnSplit('vertical', forest);
+      break;
+    case 'split_diagonal':
+      spawnSplit('diagonal', forest);
+      break;
+    case 'replace_card':
+      spawnReplaceCard(forest);
+      break;
+    case 'spawn_sibling':
+      spawnSibling(forest);
+      break;
+    case 'typography_drift':
+      applyTypographyDrift();
+      spawnCard(forest); // Still spawn a card
+      break;
+    case 'color_palette_shift':
+      applyColorShift();
+      spawnCard(forest);
+      break;
+    case 'overlay_shift':
+      applyOverlayShift();
+      spawnCard(forest);
+      break;
+    case 'aspect_swap':
+      applyAspectSwap();
+      spawnCard(forest);
+      break;
+    case 'font_size_drift':
+      applyFontSizeDrift();
+      spawnCard(forest);
+      break;
+    default:
+      spawnCard(forest);
+  }
+  
+  // Update counter
+  document.getElementById('genNum').textContent = generation;
+  
+  // Push to ancestor memory
+  pushAncestor({ mutationType, branchCount });
+}
 
-  // Auto-layout: simple grid spiral
-  const cols = 4;
-  nodes.forEach((n, i) => {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-    n.x = 80 + col * 140;
-    n.y = 30 + row * 60;
-    if (n.y > 150) n.y = 30 + (row % 3) * 60; // wrap
-  });
+// ── Spawn Functions ──
 
-  let html = '';
-  // Edges
-  QuestMap.edges.forEach(e => {
-    const from = nodes.find(n => n.id === e.from);
-    const to = nodes.find(n => n.id === e.to);
-    if (from && to) {
-      const isLoop = e.loop;
-      html += `<line x1="${from.x}" y1="${from.y}" x2="${to.x}" y2="${to.y}" 
-                stroke="${isLoop ? '#c9a050' : '#3a3a4a'}" stroke-width="${isLoop ? 2 : 1}" 
-                stroke-dasharray="${isLoop ? '4,2' : 'none'}" opacity="0.7"/>`;
+function spawnCard(parent) {
+  const card = DECK[Math.floor(Math.random() * DECK.length)];
+  
+  const node = document.createElement('div');
+  node.className = 'branch-node';
+  node.innerHTML = `
+    <div class="grimoire-card">
+      <span class="mutation-badge">🌿 gen ${generation}</span>
+      <div class="card-header">
+        <span class="card-number">#${card.num}</span>
+        <span class="card-gen">branch ${branchCount}</span>
+      </div>
+      <div class="card-title">${card.title}</div>
+      <div class="card-body">${card.body}</div>
+      <div class="card-tags">
+        ${card.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
+      </div>
+    </div>
+  `;
+  parent.appendChild(node);
+  node.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function spawnSplit(direction, parent) {
+  const container = document.createElement('div');
+  container.className = `split-container ${direction}`;
+  
+  const cell1 = document.createElement('div');
+  cell1.className = 'split-cell';
+  const card1 = DECK[Math.floor(Math.random() * DECK.length)];
+  cell1.innerHTML = `
+    <span class="mutation-badge">⬡ split ${direction}</span>
+    <div class="card-title" style="color:var(--accent)">${card1.title}</div>
+    <div class="card-body">${card1.body}</div>
+  `;
+  
+  const cell2 = document.createElement('div');
+  cell2.className = 'split-cell';
+  const card2 = DECK[Math.floor(Math.random() * DECK.length)];
+  cell2.innerHTML = `
+    <span class="mutation-badge">gen ${generation}</span>
+    <div class="card-title" style="color:var(--accent2)">${card2.title}</div>
+    <div class="card-body">${card2.body}</div>
+  `;
+  
+  container.appendChild(cell1);
+  container.appendChild(cell2);
+  parent.appendChild(container);
+  container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function spawnReplaceCard(parent) {
+  // Replace: change how cards render by modifying the function itself
+  const card = DECK[Math.floor(Math.random() * DECK.length)];
+  
+  const node = document.createElement('div');
+  node.className = 'branch-node';
+  node.innerHTML = `
+    <div class="grimoire-card" style="border-style:dashed; border-color:var(--accent2); transform:rotate(-0.3deg);">
+      <span class="mutation-badge">🔄 replaced render</span>
+      <div class="card-header">
+        <span class="card-number">#${card.num}</span>
+        <span class="card-gen">variant ${branchCount}</span>
+      </div>
+      <div class="card-title" style="writing-mode:horizontal-tb; text-orientation:mixed;">${card.title.split('').join(' ')}</div>
+      <div class="card-body" style="font-style:italic; border-left:2px solid var(--accent3); padding-left:0.8rem;">${card.body}</div>
+      <div class="card-tags">
+        ${card.tags.map(t => `<span class="card-tag" style="background:rgba(255,255,255,0.08);">${t}</span>`).join('')}
+      </div>
+    </div>
+  `;
+  parent.appendChild(node);
+  node.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+function spawnSibling(parent) {
+  // Spawn two cards side by side
+  const container = document.createElement('div');
+  container.className = 'split-container horizontal';
+  container.style.setProperty('--split-ratio', '50fr 50fr');
+  
+  for (let i = 0; i < 2; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'split-cell';
+    const card = DECK[Math.floor(Math.random() * DECK.length)];
+    cell.innerHTML = `
+      <span class="mutation-badge">👥 sibling ${i+1}</span>
+      <div class="card-title" style="color:var(--accent)">${card.title}</div>
+      <div class="card-body">${card.body}</div>
+    `;
+    container.appendChild(cell);
+  }
+  
+  parent.appendChild(container);
+  container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+// ── CSS Mutation Functions ──
+
+function applyTypographyDrift() {
+  const drifts = ['drift-serif', 'drift-mono', 'drift-sans'];
+  const current = drifts.find(d => document.body.classList.contains(d));
+  const next = drifts[(drifts.indexOf(current) + 1) % drifts.length] || drifts[0];
+  
+  document.body.classList.remove(...drifts);
+  document.body.classList.add(next);
+  console.log(`🔤 Typography drift: ${next}`);
+}
+
+function applyColorShift() {
+  const palettes = ['palette-void', 'palette-ember', 'palette-moss', 'palette-twilight'];
+  const current = palettes.find(p => document.body.classList.contains(p));
+  const next = palettes[(palettes.indexOf(current) + 1) % palettes.length] || palettes[0];
+  
+  document.body.classList.remove(...palettes);
+  document.body.classList.add(next);
+  console.log(`🎨 Palette shift: ${next}`);
+}
+
+function applyOverlayShift() {
+  const root = document.documentElement;
+  const current = parseFloat(getComputedStyle(root).getPropertyValue('--overlay-opacity'));
+  const next = Math.min(0.2, Math.max(0.02, current + (Math.random() * 0.06 - 0.03)));
+  root.style.setProperty('--overlay-opacity', next);
+  console.log(`🌫️ Overlay shift: ${next.toFixed(3)}`);
+}
+
+function applyAspectSwap() {
+  const root = document.documentElement;
+  const ratios = ['60fr 40fr', '40fr 60fr', '70fr 30fr', '30fr 70fr'];
+  const next = ratios[Math.floor(Math.random() * ratios.length)];
+  root.style.setProperty('--split-ratio', next);
+  console.log(`📐 Aspect swap: ${next}`);
+}
+
+function applyFontSizeDrift() {
+  const root = document.documentElement;
+  const current = parseFloat(getComputedStyle(root).fontSize);
+  const drift = (Math.random() * 2 - 1) * 0.5; // ±0.5px
+  const next = Math.min(18, Math.max(12, current + drift));
+  root.style.fontSize = next + 'px';
+  console.log(`📏 Font drift: ${next.toFixed(1)}px`);
+}
+
+// ── Intersection Observer (Scroll Sentinel) ──
+const sentinel = document.getElementById('scrollSentinel');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      console.log('⬇️ Bottom reached — spawning branch...');
+      spawnBranch();
     }
   });
-  // Nodes
-  nodes.forEach(n => {
-    const isCurrent = n.id === QuestMap.currentNodeId;
-    const r = isCurrent ? 14 : 10;
-    html += `<circle cx="${n.x}" cy="${n.y}" r="${r}" fill="${isCurrent ? '#8b3a3a' : '#1a1520'}" 
-              stroke="${isCurrent ? '#c9a050' : '#3a3a4a'}" stroke-width="${isCurrent ? 2 : 1}"/>`;
-    html += `<text x="${n.x}" y="${n.y - r - 4}" class="map-label${isCurrent ? ' current' : ''}">${n.label}</text>`;
-    html += `<text x="${n.x}" y="${n.y + 3}" text-anchor="middle" fill="#6b6b7b" font-size="5">${n.emoji}</text>`;
-  });
-
-  svg.innerHTML = html;
-}
-
-function addQuestNode(step) {
-  Grimoir.nodeCounter++;
-  const id = 'n' + Grimoir.nodeCounter;
-  let label = step.persona?.anchor || 'Unknown';
-  if (label.length > 10) label = label.substring(0, 9) + '…';
-  QuestMap.nodes.push({
-    id, label, emoji: step.persona?.emoji || '📜',
-    passage: step.passage?.substring(0, 60) || '',
-    x: 0, y: 0
-  });
-  if (QuestMap.currentNodeId) {
-    QuestMap.edges.push({ from: QuestMap.currentNodeId, to: id, choice: step.choice || '', loop: false });
-  }
-  QuestMap.currentNodeId = id;
-  renderQuestMap();
-}
-
-function detectOuroborosLoop(latestPassage) {
-  if (QuestMap.nodes.length < 3) return null;
-  // Simplified loop detection: check if any previous node's label matches the latest
-  const latestLabel = QuestMap.nodes[QuestMap.nodes.length - 1]?.label;
-  const match = QuestMap.nodes.slice(0, -1).find(n => n.label === latestLabel);
-  if (match) return match;
-  // Also check passage similarity (crude: first 20 chars)
-  const first20 = latestPassage?.substring(0, 20);
-  const passageMatch = QuestMap.nodes.slice(0, -1).find(n => n.passage?.substring(0, 20) === first20);
-  if (passageMatch) return passageMatch;
-  return null;
-}
-
-// ============================================================
-// ENCOUNTER POOL
-// ============================================================
-function initEncounterPool() {
-  // All personas except the one currently selected
-  const current = Grimoir.selectedPersona?.personaIndex;
-  Grimoir.encounterPool = PERSONAS.map((p, i) => i).filter(i => i !== current);
-}
-function getUnmetEncounter() {
-  if (Grimoir.encounterPool.length === 0) return null;
-  const idx = Math.floor(Math.random() * Grimoir.encounterPool.length);
-  const personaIdx = Grimoir.encounterPool.splice(idx, 1)[0];
-  return PERSONAS[personaIdx];
-}
-
-// ============================================================
-// TRANSFORMERS.JS SETUP (Lazy-loaded)
-// ============================================================
-let generator = null;
-async function loadGenerator() {
-  if (generator) return generator;
-  log('inkwell', '🌑 Loading the quill (Transformers.js)...');
-  
-  // Dynamic import — only runs in browser
-  const { pipeline } = await import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1/dist/transformers.min.js');
-  
-  log('inkwell', '🌑 Sharpening the nib...');
-  generator = await pipeline('text-generation', 'Xenova/distilgpt2', {
-    quantized: true
-  });
-  log('inkwell', '🌑 The quill is ready.');
-  return generator;
-}
-
-async function generatePassage(prompt) {
-  const gen = await loadGenerator();
-  log('inkwell', '🌑 Writing passage...');
-  
-  const fullPrompt = `You are a dark fantasy storyteller in the style of old fairy tales and fables. Write in a gothic, literary voice. Use short, rhythmic sentences. The tone is haunting, beautiful, and strange.
-
-${prompt}
-
-Passage (3-5 sentences, ending with exactly 3 choices starting with "→"):`;
-
-  try {
-    const result = await gen(fullPrompt, {
-      max_new_tokens: 200,
-      temperature: 0.85,
-      do_sample: true,
-      top_k: 50,
-      top_p: 0.9
-    });
-    
-    const generated = result[0]?.generated_text || '';
-    // Extract just the new part after the prompt
-    const newText = generated.replace(fullPrompt, '').trim();
-    return newText;
-  } catch (e) {
-    log('inkwell', `⚠️ Quill slipped: ${e.message}`);
-    // Fallback: static passage
-    return generateFallbackPassage();
-  }
-}
-
-function generateFallbackPassage() {
-  const persona = PERSONAS[Grimoir.selectedPersona?.personaIndex || 0];
-  const harmonic = persona.harmonics[Grimoir.selectedPersona?.variationIndex || 0];
-  const fate = FATES[Math.floor(Math.random() * FATES.length)];
-  
-  const passages = [
-    `${harmonic} ${persona.anchor} ${fate.verb} ${fate.object}. The air grew still, as if the world itself held its breath, waiting to see what would happen next. Something old stirred in the dark between the trees — something that had been waiting for exactly this moment.`,
-    
-    `At the edge of the ${fate.domain.toLowerCase()}, ${harmonic} ${persona.anchor} paused. ${fate.verb} ${fate.object} was no small thing. The ground beneath their feet remembered every step that had ever been taken here, and it whispered warnings in a language older than words.`,
-    
-    `${harmonic} ${persona.anchor} ${fate.verb} ${fate.object}, not knowing that this single act would ripple outward through the weave of all things. Thyrdeth, watching from her grove, felt the thread tremble. Somewhere in the deep wood, the Wolf raised its head.`
-  ];
-  
-  const passage = passages[Math.floor(Math.random() * passages.length)];
-  
-  const choices = [
-    `→ Follow the thread deeper into the ${fate.domain.toLowerCase()}`,
-    `→ Turn back while the path still remembers you`,
-    `→ Call out to whatever is watching from the dark`
-  ];
-  
-  return { passage, choices };
-}
-
-function parseGeneratedOutput(text) {
-  if (!text) return generateFallbackPassage();
-  
-  // Split into passage and choices
-  const lines = text.split('\n').filter(l => l.trim());
-  const choiceLines = lines.filter(l => l.trim().startsWith('→') || l.trim().startsWith('-'));
-  const passageLines = lines.filter(l => !choiceLines.includes(l));
-  
-  let passage = passageLines.join(' ').trim();
-  let choices = choiceLines.map(l => l.replace(/^[→\-]\s*/, '').trim()).filter(c => c.length > 0);
-  
-  // If no choices parsed, generate defaults
-  if (choices.length < 3) {
-    const fallback = generateFallbackPassage();
-    choices = fallback.choices;
-    if (!passage) passage = fallback.passage;
-  }
-  
-  // Ensure exactly 3 choices
-  choices = choices.slice(0, 3);
-  while (choices.length < 3) {
-    choices.push(`→ Continue deeper into the tale`);
-  }
-  
-  return { passage: passage || text.substring(0, 200), choices };
-}
-
-// ============================================================
-// TOME · Hermes (Persona Selection)
-// ============================================================
-function renderPersonaGrid() {
-  const grid = document.getElementById('persona-grid');
-  grid.innerHTML = PERSONAS.map((p, i) => {
-    const sel = Grimoir.selectedPersona?.personaIndex === i;
-    return `<div class="persona-card${sel ? ' selected' : ''}" onclick="selectPersona(${i})">
-      <span class="emoji">${p.emoji}</span><span class="name">${p.anchor}</span></div>`;
-  }).join('');
-}
-
-function selectPersona(index) {
-  Grimoir.selectedPersona = { personaIndex: index, variationIndex: null };
-  const p = PERSONAS[index];
-  const row = document.getElementById('variation-row');
-  row.style.display = 'flex';
-  row.innerHTML = p.harmonics.map((h, vi) => 
-    `<div class="variation-chip" onclick="selectVariation(${vi})">${h}</div>`
-  ).join('');
-  document.getElementById('slot-persona').textContent = p.emoji + ' ' + p.anchor;
-  document.getElementById('slot-persona').className = 'chord-slot filled';
-  document.getElementById('slot-harmonic').textContent = 'Aspect';
-  document.getElementById('slot-harmonic').className = 'chord-slot';
-  log('tome', `📜 ${p.emoji} ${p.anchor} chosen. Select an aspect.`);
-  renderPersonaGrid();
-}
-
-function selectVariation(vi) {
-  if (!Grimoir.selectedPersona) return;
-  Grimoir.selectedPersona.variationIndex = vi;
-  const p = PERSONAS[Grimoir.selectedPersona.personaIndex];
-  document.getElementById('slot-harmonic').textContent = p.harmonics[vi];
-  document.getElementById('slot-harmonic').className = 'chord-slot filled';
-  document.querySelectorAll('#variation-row .variation-chip').forEach((c, i) => 
-    c.className = `variation-chip${i === vi ? ' chosen' : ''}`
-  );
-  log('tome', `✅ ${p.harmonics[vi]} ${p.anchor} stands at the threshold.`);
-}
-
-function tomeClear() {
-  Grimoir.selectedPersona = null;
-  document.getElementById('variation-row').style.display = 'none';
-  document.getElementById('slot-persona').textContent = 'Persona';
-  document.getElementById('slot-persona').className = 'chord-slot';
-  document.getElementById('slot-harmonic').textContent = 'Aspect';
-  document.getElementById('slot-harmonic').className = 'chord-slot';
-  renderPersonaGrid();
-  log('tome', '🕯️ Cleared.');
-}
-
-function tomeSend() {
-  if (!Grimoir.selectedPersona || Grimoir.selectedPersona.variationIndex === null) {
-    log('tome', '⚠️ Choose a persona AND an aspect.');
-    return;
-  }
-  const p = PERSONAS[Grimoir.selectedPersona.personaIndex];
-  const h = p.harmonics[Grimoir.selectedPersona.variationIndex];
-  const label = `${h} ${p.anchor}`;
-  log('tome', `📜 Sending: ${label}`);
-  enqueue('tome', { icon: '📜', label });
-  setOutput('tome', `<div style="text-align:center;font-size:0.9rem;color:var(--gold);">📜 ${label}</div>`);
-  
-  // Send to Binding
-  enqueue('binding', { icon: '🩸', label, personaIndex: Grimoir.selectedPersona.personaIndex, harmonic: h });
-  log('binding', `🩸 Received soul: "${label}" — ready for fate binding.`);
-}
-
-// ============================================================
-// BINDING · Aphrodite (Fate Selection)
-// ============================================================
-let bindingSuggestions = [];
-function bindingSuggest() {
-  if (!Grimoir.gods.binding.queue.length) {
-    log('binding', '⚠️ No soul to bind. The Tome must send first.');
-    return;
-  }
-  const shuffled = [...FATES].sort(() => Math.random() - 0.5);
-  bindingSuggestions = shuffled.slice(0, 3);
-  log('binding', `🩸 Fates offered: ${bindingSuggestions.map(s => s.verb + ' ' + s.object).join(' | ')}`);
-  setOutput('binding', 
-    `<div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;">` +
-    bindingSuggestions.map((s, i) => 
-      `<div style="padding:8px;background:#1a1520;border-radius:6px;font-size:0.6rem;cursor:pointer;border:1px solid #2a1a1a;" onclick="bindingPick(${i})">
-        🩸 ${s.verb} ${s.object}<br><span style="color:var(--muted)">[${s.domain}]</span></div>`
-    ).join('') + `</div>`
-  );
-}
-function bindingPick(index) {
-  const s = bindingSuggestions[index];
-  const item = Grimoir.gods.binding.queue[0];
-  const pair = { persona: item.label, verb: s.verb, object: s.object, domain: s.domain };
-  log('binding', `🩸 Pact sealed: ${pair.persona} ${pair.verb} ${pair.object} [${pair.domain}]`);
-  Grimoir.gods.binding.output.push(pair);
-  setOutput('binding', 
-    `<div style="text-align:center;padding:10px;background:#1a1520;border:1px solid var(--blood);border-radius:8px;">
-      🩸 <b>${pair.persona}</b><br>${pair.verb} ${pair.object}<br><span style="color:var(--muted)">${pair.domain}</span></div>`
-  );
-  dequeue('binding');
-  // Push to Quill
-  enqueue('quill', { icon: '🕯️', label: `${pair.persona} ${pair.verb} ${pair.object}`, pair });
-  log('quill', `🕯️ Received sealed pact from Binding.`);
-}
-function bindingSeal() {
-  if (!Grimoir.gods.binding.queue.length) {
-    log('binding', '⚠️ Nothing to seal.');
-    return;
-  }
-  if (!bindingSuggestions.length) {
-    log('binding', '⚠️ Tap "Suggest Fates" first.');
-    return;
-  }
-  bindingPick(0);
-}
-
-// ============================================================
-// QUILL · Apollo (Atmosphere + Prompt)
-// ============================================================
-function quillAtmosphere() {
-  const atmospheres = [
-    'gothic, candlelit, dust motes floating in still air',
-    'deep forest, moss-covered stones, the scent of old rain',
-    'twilight at the edge of the world, where the sea meets something older',
-    'inside a dream that is beginning to remember it is a dream'
-  ];
-  Grimoir.gods.quill._atmosphere = atmospheres[Math.floor(Math.random() * atmospheres.length)];
-  log('quill', `🌑 Atmosphere: ${Grimoir.gods.quill._atmosphere}`);
-}
-function quillInscribe() {
-  const item = dequeue('quill');
-  if (!item) { log('quill', '⚠️ No pact to inscribe.'); return; }
-  if (!Grimoir.gods.quill._atmosphere) quillAtmosphere();
-  const prompt = `${item.pair.persona} ${item.pair.verb} ${item.pair.object}. ${Grimoir.gods.quill._atmosphere}.`;
-  log('quill', `🕯️ Inscription: "${prompt.substring(0, 80)}..."`);
-  Grimoir.gods.quill.output.push(prompt);
-  setOutput('quill', 
-    `<div style="padding:10px;background:#1a1520;border:1px solid var(--gold);border-radius:8px;font-size:0.65rem;font-style:italic;">
-      🕯️ ${prompt}</div>`
-  );
-  // Push to Inkwell
-  enqueue('inkwell', { icon: '🌑', label: prompt, prompt, pair: item.pair });
-  log('inkwell', `🌑 Seed received from Quill.`);
-}
-
-// ============================================================
-// INKWELL · Demeter (Passage Generation + Quest Map)
-// ============================================================
-function inkwellMutate() {
-  if (!Grimoir.gods.inkwell.queue.length) {
-    log('inkwell', '⚠️ No seeds to twist.');
-    return;
-  }
-  const item = Grimoir.gods.inkwell.queue[0];
-  const mutations = [
-    item.prompt.replace('meets', 'confronts in the darkness'),
-    item.prompt + ', where an old wound still bleeds',
-    item.prompt.replace('crosses', 'flees across'),
-    item.prompt + ', and the stars above are not their own'
-  ];
-  item.prompt = mutations[Math.floor(Math.random() * mutations.length)];
-  item.label = item.prompt;
-  log('inkwell', `🕸️ Thread twisted: "${item.prompt.substring(0, 60)}..."`);
-  renderQueue('inkwell');
-}
-
-async function inkwellWrite() {
-  const item = dequeue('inkwell');
-  if (!item) { log('inkwell', '⚠️ No seeds.'); return; }
-  
-  // Show loading
-  setOutput('inkwell', `<div style="text-align:center;color:var(--muted);font-size:0.7rem;font-style:italic;padding:20px;">
-    🌑 The ink stirs...<br><span style="font-size:0.55rem;">${item.prompt.substring(0, 60)}...</span></div>`);
-  
-  let result;
-  try {
-    const raw = await generatePassage(item.prompt);
-    result = parseGeneratedOutput(raw);
-  } catch (e) {
-    result = generateFallbackPassage();
-  }
-  
-  const { passage, choices } = result;
-  
-  // Add to story history
-  const step = {
-    persona: PERSONAS[Grimoir.selectedPersona?.personaIndex || 0],
-    harmonic: Grimoir.selectedPersona?.variationIndex !== null ? 
-      PERSONAS[Grimoir.selectedPersona.personaIndex].harmonics[Grimoir.selectedPersona.variationIndex] : '',
-    fate: item.pair,
-    passage,
-    choices
-  };
-  Grimoir.storyHistory.push(step);
-  
-  // Add to quest map
-  addQuestNode(step);
-  
-  // Check for loop
-  const loop = detectOuroborosLoop(passage);
-  if (loop && Grimoir.storyHistory.length >= 3) {
-    log('threshold', '🕸️ An echo detected — the story folds back on itself.');
-    choices.push('🕸️ Step through the threshold (the story remembers you)');
-    // Mark the edge as loop
-    const lastEdge = QuestMap.edges[QuestMap.edges.length - 1];
-    if (lastEdge) lastEdge.loop = true;
-    renderQuestMap();
-  }
-  
-  // Check encounter pool
-  if (Grimoir.storyHistory.length >= 3 && Math.random() < 0.4) {
-    const stranger = getUnmetEncounter();
-    if (stranger) {
-      choices.push(`👤 A stranger approaches: ${stranger.emoji} ${stranger.anchor}`);
-      log('inkwell', `👤 Stranger on the path: ${stranger.anchor}`);
-    }
-  }
-  
-  // Render passage + choices
-  let html = `<div class="passage">${passage}</div>`;
-  choices.forEach((c, i) => {
-    html += `<button class="choice-btn" onclick="inkwellChoose(${i})">${c}</button>`;
-  });
-  setOutput('inkwell', html);
-  
-  log('inkwell', `🌑 Passage written. ${choices.length} paths offered.`);
-  
-  // Push to Threshold
-  enqueue('threshold', { icon: '🕸️', label: passage.substring(0, 60) + '…', passage });
-  log('threshold', '🕸️ Passage received for reflection.');
-}
-
-function inkwellChoose(choiceIndex) {
-  const lastStep = Grimoir.storyHistory[Grimoir.storyHistory.length - 1];
-  if (!lastStep) return;
-  
-  const choice = lastStep.choices[choiceIndex];
-  log('inkwell', `🕯️ Chosen: "${choice}"`);
-  
-  // Push back to Tome as token for next cycle
-  enqueue('tome', { icon: '📜', label: choice });
-  log('tome', `📜 New thread received: "${choice.substring(0, 40)}..."`);
-  
-  // Clear output and show continuation prompt
-  setOutput('inkwell', `<div style="text-align:center;color:var(--gold);font-size:0.7rem;padding:20px;">
-    🕯️ The thread is chosen.<br><span style="color:var(--muted);">Return to the Tome to continue weaving...</span></div>`);
-  
-  // Update quest map to highlight this node
-  renderQuestMap();
-}
-
-// ============================================================
-// THRESHOLD · Poseidon (Theme Extraction)
-// ============================================================
-function thresholdTheme() {
-  if (!Grimoir.storyHistory.length) {
-    log('threshold', '🕸️ No passages to reflect upon.');
-    return;
-  }
-  const themes = ['sacrifice','transformation','memory','hunger','flight','debt','pact','threshold','shadow','return'];
-  const picked = themes.slice(0, 3).sort(() => Math.random() - 0.5);
-  log('threshold', `🕯️ Themes: ${picked.join(', ')}`);
-  setOutput('threshold', 
-    `<div style="padding:10px;font-size:0.65rem;font-style:italic;color:var(--muted);text-align:center;">
-      🕯️ The weave reveals: <b style="color:var(--blood);">${picked.join(' · ')}</b></div>`
-  );
-}
-
-function thresholdLoop() {
-  const loop = detectOuroborosLoop(
-    Grimoir.storyHistory[Grimoir.storyHistory.length - 1]?.passage || ''
-  );
-  if (loop) {
-    log('threshold', `🕸️ Ouroboros turns. The story echoes: "${loop.label}"`);
-    setOutput('threshold', 
-      `<div style="padding:10px;font-size:0.65rem;text-align:center;color:var(--gold);">
-        🕸️ The serpent finds its tail.<br>The story remembers <b>${loop.label}</b>.</div>`
-    );
-  } else {
-    log('threshold', '🕸️ No echoes yet. The thread is still new.');
-    setOutput('threshold', '<div class="output-placeholder">No echoes detected yet.</div>');
-  }
-}
-
-// ============================================================
-// PACT · Hera (Telos & Lineage)
-// ============================================================
-function pactSetTelos() {
-  const telos = prompt('🩸 Set the creative intention for this tale:', Grimoir.activeTelos || '');
-  if (!telos) return;
-  Grimoir.activeTelos = telos;
-  Grimoir.telosLineage.push({ telos, timestamp: new Date().toISOString() });
-  updateAllTelos();
-  log('pact', `🩸 Intention set: "${telos}"`);
-  ['tome','binding','quill','inkwell','threshold'].forEach(g => 
-    log(g, `🩸 Intention received: "${telos}"`)
-  );
-  enqueue('pact', { icon: '🩸', label: telos });
-}
-function pactLineage() {
-  if (!Grimoir.telosLineage.length) {
-    setOutput('pact', '<div class="output-placeholder">No intentions yet recorded.</div>');
-    return;
-  }
-  setOutput('pact', Grimoir.telosLineage.map((t, i) => 
-    `<div style="padding:4px;font-size:0.6rem;font-style:italic;">🕯️ ${t.telos}</div>`
-  ).join(''));
-}
-
-// ============================================================
-// SWIPE NAVIGATION
-// ============================================================
-let currentGodIndex = 0;
-const godOrder = ['tome','binding','quill','inkwell','threshold','pact'];
-const ouroboros = document.getElementById('ouroboros');
-ouroboros.addEventListener('scroll', () => {
-  const idx = Math.round(ouroboros.scrollLeft / window.innerWidth);
-  if (idx !== currentGodIndex && idx >= 0 && idx < godOrder.length) {
-    currentGodIndex = idx;
-    updateNavHint();
-  }
-});
-function updateNavHint() {
-  const icons = ['⚓','🩸','🕯️','🌑','🕸️','🜚'];
-  document.getElementById('nav-hint').innerHTML = godOrder.map((g, i) => 
-    `<span class="${i === currentGodIndex ? 'active' : ''}">${icons[i]}</span>`
-  ).join(' · ');
-}
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowRight' && currentGodIndex < godOrder.length - 1) {
-    e.preventDefault();
-    ouroboros.scrollTo({ left: (currentGodIndex + 1) * window.innerWidth, behavior: 'smooth' });
-  }
-  if (e.key === 'ArrowLeft' && currentGodIndex > 0) {
-    e.preventDefault();
-    ouroboros.scrollTo({ left: (currentGodIndex - 1) * window.innerWidth, behavior: 'smooth' });
-  }
+}, {
+  root: null,
+  rootMargin: '0px',
+  threshold: 0.1
 });
 
-// ============================================================
-// INIT
-// ============================================================
+observer.observe(sentinel);
+
+// ── Initialize ──
 function init() {
-  renderPersonaGrid();
-  updateAllTelos();
-  updateNavHint();
-  renderQuestMap();
-  initEncounterPool();
-  log('pact', '🜚 Grimoir awakens. The bargain is struck. Swipe between the six rites.');
-  log('tome', '⚓ The Tome opens. Choose a persona to begin.');
+  console.log('🌿 Recursive Grimoire — Initializing...');
+  console.log(`📜 ${DECK.length} cards loaded`);
+  console.log(`🔀 ${MUTATIONS.length} mutation types available`);
+  
+  // Spawn initial card
+  const forest = document.getElementById('branchForest');
+  const seedCard = DECK[0]; // The Fool
+  
+  const node = document.createElement('div');
+  node.className = 'branch-node';
+  node.innerHTML = `
+    <div class="grimoire-card">
+      <span class="mutation-badge">🌱 seed</span>
+      <div class="card-header">
+        <span class="card-number">#${seedCard.num}</span>
+        <span class="card-gen">origin</span>
+      </div>
+      <div class="card-title">${seedCard.title}</div>
+      <div class="card-body">${seedCard.body}</div>
+      <div class="card-tags">
+        ${seedCard.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
+      </div>
+    </div>
+  `;
+  forest.appendChild(node);
+  
+  generation = 1;
+  branchCount = 1;
+  document.getElementById('genNum').textContent = generation;
+  
+  console.log('🌱 Seed planted. Scroll down to grow the grimoire.');
+  console.log('📖 The page consumes itself and grows downward forever.');
 }
 
-  // ============================================================
-// EXPOSE TO GLOBAL SCOPE (for inline onclick handlers in module)
-// ============================================================
-window.selectPersona = selectPersona;
-window.selectVariation = selectVariation;
-window.tomeClear = tomeClear;
-window.tomeSend = tomeSend;
-window.bindingSuggest = bindingSuggest;
-window.bindingPick = bindingPick;
-window.bindingSeal = bindingSeal;
-window.quillAtmosphere = quillAtmosphere;
-window.quillInscribe = quillInscribe;
-window.inkwellMutate = inkwellMutate;
-window.inkwellWrite = inkwellWrite;
-window.inkwellChoose = inkwellChoose;
-window.thresholdTheme = thresholdTheme;
-window.thresholdLoop = thresholdLoop;
-window.pactSetTelos = pactSetTelos;
-window.pactLineage = pactLineage;
-  document.addEventListener('DOMContentLoaded', init);
+init();
+
+// ── Keyboard Controls ──
+document.addEventListener('keydown', (e) => {
+  switch (e.key.toLowerCase()) {
+    case 'g':
+      console.log('🌿 Manual spawn triggered');
+      spawnBranch();
+      break;
+    case 'm':
+      console.log('🧬 Forcing mutation...');
+      const mutation = MUTATIONS[Math.floor(Math.random() * MUTATIONS.length)];
+      spawnBranch(mutation);
+      break;
+    case 'r':
+      console.log('📜 Ancestor memory stack:', ancestorStack.length, 'entries');
+      console.table(ancestorStack.slice(-10));
+      break;
+    case 'c':
+      console.log('🎨 Random color shift');
+      applyColorShift();
+      break;
+    case 't':
+      console.log('🔤 Random typography drift');
+      applyTypographyDrift();
+      break;
+    default:
+      break;
+  }
+});
+
+console.log('⌨️ Controls: [G] spawn branch · [M] force mutation · [R] view memory · [C] color shift · [T] typography drift');
 </script>
 </body>
 </html>
